@@ -1,0 +1,256 @@
+# -*- coding: utf-8 -*-
+# =============================================================================
+#  BOSTON BUNNIES SAIL TEAM  —  Downwind Trimaran, one-piece 3D print
+# =============================================================================
+#  Run this macro inside FreeCAD (Macro > Macros... > Execute).
+#  It builds a fully parametric model. Edit the PARAMETERS block and re-run
+#  to regenerate. Tested API: FreeCAD 0.20 / 0.21 / 1.0 (Part workbench only).
+#
+#  Coordinate system (sailing orientation):
+#    X = bow (0) to stern (LOA)      Y = port(-) / starboard(+)      Z = up
+#    Deck plane is Z = 0. Underwater is negative Z.
+#
+#  PRINTING: flip the tri-hull body 180 deg about X in your slicer so the
+#  DECK sits on the bed and the rounded hulls point up. Everything on deck
+#  is a recess (no protrusions), so it prints flat with no supports.
+#  Estimated waterline when sailing: Z = -16 mm (see spec sheet).
+#
+#  Parts generated:
+#    Trimaran_Body   - main hull + 2 amas + 2 crossbeams + skeg (one print)
+#    Rudder_Blade    - socket for 3 mm stock
+#    Rudder_Tiller   - LONG arm, starboard side, 4 gain holes
+#    Vane_Paddle     - vane blade + spine + counterweight arm
+#    Vane_Arm        - SHORT arm, port side, 4 gain holes
+#
+#  Hardware (buy): 2x 623ZZ bearing (3x10x4 mm), 3 mm carbon rod or bamboo
+#  skewer x2, 6 mm hardwood dowel (mast), M2 RC pushrod + 2 clevises,
+#  1x M3x16 screw + nuts (vane counterweight).
+# =============================================================================
+
+import math
+import FreeCAD as App
+import Part
+from FreeCAD import Vector
+
+# ----------------------------------------------------------------------------
+# PARAMETERS  (all mm)
+# ----------------------------------------------------------------------------
+# -- main hull: stations along X, half-beam and depth at each station.
+#    Double-ended (near-pointy ends). Edit freely; keep first/last tiny.
+MAIN_X = [0,   15,  40,  80,  120, 160, 185, 200]
+MAIN_B = [1,   10,  22,  30,  28,  18,  8,   1]     # half-beam
+MAIN_D = [3,   18,  32,  40,  38,  28,  16,  3]     # depth below deck
+
+# -- amas (double-ended, shallower so they just kiss the water)
+AMA_X  = [0,   20,  50,  80,  110, 130]
+AMA_B  = [0.6, 8,   13,  13,  8,   0.6]
+AMA_D  = [1.5, 9,   14,  14,  9,   1.5]   # bottoms ~2 mm above waterline
+AMA_X0     = 35.0        # ama bow position along main-hull X
+AMA_OFFSET = 82.5        # centerline of each ama from boat centerline
+
+# -- crossbeams (rectangular, at deck level so they lie on the print bed)
+BEAM_W   = 12.0          # fore-aft width
+BEAM_T   = 6.0           # thickness (hangs below deck; well above waterline)
+BEAM_X   = [60.0, 120.0] # leading edge of each beam
+BEAM_Y   = 88.0          # half-span. Must stop INSIDE the ama skin:
+                         # at 92 the fwd beam pierced the outboard wall where
+                         # the ama narrows. 88 leaves >=3.7 mm of skin.
+
+# -- mast socket (for a store-bought 6 mm hardwood dowel)
+MAST_X     = 80.0        # 40% of LOA from bow -> pushes CE forward: downwind stable
+MAST_DIA   = 6.4         # 6 mm dowel + clearance
+MAST_DEPTH = 24.0
+
+# -- skeg (fixed fin, gives the steering loop its damping)
+SKEG_X0, SKEG_X1 = 146.0, 172.0
+SKEG_Z_TIP  = -42.0
+SKEG_THICK  = 3.0
+
+# -- bearings: 623ZZ = 3 mm bore, 10 mm OD, 4 mm thick
+BRG_OD, BRG_T   = 10.2, 4.5     # counterbore dia / depth (press fit + seat)
+STICK_CLEAR     = 3.6           # clearance hole for 3 mm stock below bearing
+
+RUDDER_X = 172.0         # rudder stock position (just aft of skeg)
+VANE_X   = 140.0         # vane pivot (upwind of rudder when running)
+
+# -- rudder blade
+RUD_CHORD   = 18.0
+RUD_THICK   = 3.0
+RUD_Z_TOP   = -24.0      # just below hull bottom at that station
+RUD_Z_TIP   = -56.0      # deeper than the skeg so it keeps grip
+RUD_PIVOT_FRAC = 0.25    # stock at 25% chord (semi-balanced)
+
+# -- arms.  GAIN = vane arm length / tiller arm length  (aim 0.3 - 0.5)
+TILLER_HOLES = [12, 18, 24, 30]     # starboard side (LONG)
+VANE_HOLES   = [6, 10, 14, 18]      # port side (SHORT)
+ARM_W, ARM_T = 8.0, 4.0
+ARM_Z0       = 3.0                  # bottom of arms above deck
+PIN_DIA      = 1.6                  # RC clevis pin holes
+
+# -- vane paddle
+VANE_PLATE_W  = 36.0     # fore-aft extent of the blade
+VANE_PLATE_H  = 72.0
+VANE_PLATE_T  = 1.0     # thin: blade mass is the whole balance problem
+VANE_SPINE_Z0, VANE_SPINE_Z1 = 9.0, 120.0
+CW_ARM_LEN    = 50.0     # counterweight arm, opposite side of the axis
+CW_ARM_Z      = 62.0     # set at the blade's vertical centroid: balances the
+                         # tipping couple on the bearing as well as the yaw moment
+CW_SLOT_R0    = 20.0     # slide the screw along this slot to trim to neutral
+CW_SLOT_R1    = 48.0
+
+STOCK_SOCKET = 3.2       # push-fit hole for the 3 mm stock in printed parts
+
+# ----------------------------------------------------------------------------
+# helpers
+# ----------------------------------------------------------------------------
+ROT_YZ = App.Rotation(Vector(1, 1, 1), 120)   # maps local X->Y, Y->Z (section
+                                              # drawn flat, placed athwartships)
+
+def section_wire(x, half_beam, depth):
+    """Closed wire at station x: lower half-ellipse + deck line."""
+    ell = Part.Ellipse(Vector(0, 0, 0), half_beam, depth)
+    arc = Part.ArcOfEllipse(ell, math.pi, 2 * math.pi).toShape()
+    top = Part.makeLine(Vector(half_beam, 0, 0), Vector(-half_beam, 0, 0))
+    w = Part.Wire([arc, top])
+    w.Placement = App.Placement(Vector(x, 0, 0), ROT_YZ)
+    return w
+
+def hull_solid(xs, bs, ds, x_shift=0.0, y_shift=0.0):
+    wires = [section_wire(x + x_shift, b, d) for x, b, d in zip(xs, bs, ds)]
+    solid = Part.makeLoft(wires, True, False)
+    if y_shift:
+        solid.translate(Vector(0, y_shift, 0))
+    return solid
+
+def cyl(d, h, base):
+    return Part.makeCylinder(d / 2.0, h, base)
+
+# ----------------------------------------------------------------------------
+# build: tri-hull body
+# ----------------------------------------------------------------------------
+doc = App.newDocument("BostonBunniesTrimaran")
+
+main = hull_solid(MAIN_X, MAIN_B, MAIN_D)
+ama_p = hull_solid(AMA_X, AMA_B, AMA_D, AMA_X0, -AMA_OFFSET)
+ama_s = hull_solid(AMA_X, AMA_B, AMA_D, AMA_X0, +AMA_OFFSET)
+
+beams = []
+for bx in BEAM_X:
+    beams.append(Part.makeBox(BEAM_W, 2 * BEAM_Y, BEAM_T,
+                              Vector(bx, -BEAM_Y, -BEAM_T)))
+    # gussets: soften the beam/hull corner (the stress riser, not the strength)
+    for sy in (-1, 1):
+        for x_at, x_to in ((bx, bx - 9), (bx + BEAM_W, bx + BEAM_W + 9)):
+            poly = Part.makePolygon([Vector(x_at, sy * 24, -BEAM_T),
+                                     Vector(x_to, sy * 24, -BEAM_T),
+                                     Vector(x_at, sy * 40, -BEAM_T),
+                                     Vector(x_at, sy * 24, -BEAM_T)])
+            beams.append(Part.Face(poly).extrude(Vector(0, 0, BEAM_T)))
+
+# skeg: extruded trapezoid in the XZ plane (raked leading edge)
+skeg_pts = [Vector(SKEG_X0, 0, -10),
+            Vector(SKEG_X1, 0, -10),
+            Vector(SKEG_X1, 0, SKEG_Z_TIP),
+            Vector(SKEG_X0 + 10, 0, SKEG_Z_TIP + 6),
+            Vector(SKEG_X0, 0, -10)]
+skeg_face = Part.Face(Part.makePolygon(skeg_pts))
+skeg = skeg_face.extrude(Vector(0, SKEG_THICK, 0))
+skeg.translate(Vector(0, -SKEG_THICK / 2.0, 0))
+
+# internal seat pads under the deck for the two bearings
+pad_rud = cyl(14.0, 6.0, Vector(RUDDER_X, 0, -6))
+pad_van = cyl(14.0, 6.0, Vector(VANE_X, 0, -6))
+
+body = main.fuse(beams + [ama_p, ama_s, skeg, pad_rud, pad_van])
+body = body.removeSplitter()
+
+# cuts: mast socket, bearing counterbores, stock holes
+cuts = []
+cuts.append(cyl(MAST_DIA, MAST_DEPTH, Vector(MAST_X, 0, -MAST_DEPTH)))
+cuts.append(cyl(BRG_OD, BRG_T, Vector(RUDDER_X, 0, -BRG_T)))          # rudder brg
+cuts.append(cyl(STICK_CLEAR, 60.0, Vector(RUDDER_X, 0, -60)))         # thru hull
+cuts.append(cyl(BRG_OD, BRG_T, Vector(VANE_X, 0, -BRG_T)))            # vane brg
+cuts.append(cyl(STICK_CLEAR, 14.0, Vector(VANE_X, 0, -BRG_T - 14)))   # blind
+for c in cuts:
+    body = body.cut(c)
+body = body.removeSplitter()
+
+obj = doc.addObject("Part::Feature", "Trimaran_Body")
+obj.Shape = body
+
+# ----------------------------------------------------------------------------
+# build: rudder blade (in place; reorient flat in the slicer)
+# ----------------------------------------------------------------------------
+x_le = RUDDER_X - RUD_PIVOT_FRAC * RUD_CHORD
+blade = Part.makeBox(RUD_CHORD, RUD_THICK, RUD_Z_TOP - RUD_Z_TIP,
+                     Vector(x_le, -RUD_THICK / 2.0, RUD_Z_TIP))
+boss = cyl(8.0, 14.0, Vector(RUDDER_X, 0, RUD_Z_TOP - 2))
+rudder = blade.fuse(boss)
+rudder = rudder.cut(cyl(STOCK_SOCKET, 26.0,
+                        Vector(RUDDER_X, 0, RUD_Z_TOP - 14)))
+doc.addObject("Part::Feature", "Rudder_Blade").Shape = rudder.removeSplitter()
+
+# ----------------------------------------------------------------------------
+# build: tiller arm  (LONG, starboard)
+# ----------------------------------------------------------------------------
+tiller = Part.makeBox(ARM_W, TILLER_HOLES[-1] + 10, ARM_T,
+                      Vector(RUDDER_X - ARM_W / 2.0, -5, ARM_Z0))
+tiller = tiller.fuse(cyl(8.0, ARM_T, Vector(RUDDER_X, 0, ARM_Z0)))
+tiller = tiller.cut(cyl(STOCK_SOCKET, ARM_T + 2,
+                        Vector(RUDDER_X, 0, ARM_Z0 - 1)))
+for y in TILLER_HOLES:
+    tiller = tiller.cut(cyl(PIN_DIA, ARM_T + 2,
+                            Vector(RUDDER_X, y, ARM_Z0 - 1)))
+doc.addObject("Part::Feature", "Rudder_Tiller").Shape = tiller.removeSplitter()
+
+# ----------------------------------------------------------------------------
+# build: vane paddle (blade sits DOWNWIND of the axis = toward the bow
+# when running; counterweight arm balances it aft)
+# ----------------------------------------------------------------------------
+spine = cyl(8.0, VANE_SPINE_Z1 - VANE_SPINE_Z0,
+            Vector(VANE_X, 0, VANE_SPINE_Z0))
+plate = Part.makeBox(VANE_PLATE_W, VANE_PLATE_T, VANE_PLATE_H,
+                     Vector(VANE_X - 3 - VANE_PLATE_W, -VANE_PLATE_T / 2.0, 28))
+cw = Part.makeBox(CW_ARM_LEN, 5.0, 4.0,
+                  Vector(VANE_X + 3, -2.5, CW_ARM_Z))
+paddle = spine.fuse([plate, cw])
+paddle = paddle.cut(cyl(STOCK_SOCKET, 55.0,
+                        Vector(VANE_X, 0, VANE_SPINE_Z0)))
+# slot for the M3 trim screw (slide to balance, then lock with a nut)
+slot = Part.makeBox(CW_SLOT_R1 - CW_SLOT_R0, 3.2, 8.0,
+                    Vector(VANE_X + CW_SLOT_R0, -1.6, CW_ARM_Z - 2))
+slot = slot.fuse(cyl(3.2, 8.0, Vector(VANE_X + CW_SLOT_R0, 0, CW_ARM_Z - 2)))
+slot = slot.fuse(cyl(3.2, 8.0, Vector(VANE_X + CW_SLOT_R1, 0, CW_ARM_Z - 2)))
+paddle = paddle.cut(slot)
+doc.addObject("Part::Feature", "Vane_Paddle").Shape = paddle.removeSplitter()
+
+# ----------------------------------------------------------------------------
+# build: vane arm  (SHORT, PORT — opposite side to the tiller: this reversal
+# is what makes the correction push the bow back instead of chasing it away)
+# ----------------------------------------------------------------------------
+varm = Part.makeBox(ARM_W, VANE_HOLES[-1] + 10, ARM_T,
+                    Vector(VANE_X - ARM_W / 2.0, -(VANE_HOLES[-1] + 5), ARM_Z0))
+varm = varm.fuse(cyl(8.0, ARM_T, Vector(VANE_X, 0, ARM_Z0)))
+varm = varm.cut(cyl(STOCK_SOCKET, ARM_T + 2, Vector(VANE_X, 0, ARM_Z0 - 1)))
+for y in VANE_HOLES:
+    varm = varm.cut(cyl(PIN_DIA, ARM_T + 2, Vector(VANE_X, -y, ARM_Z0 - 1)))
+doc.addObject("Part::Feature", "Vane_Arm").Shape = varm.removeSplitter()
+
+doc.recompute()
+try:
+    import FreeCADGui
+    FreeCADGui.SendMsgToActiveView("ViewFit")
+except Exception:
+    pass
+
+App.Console.PrintMessage(
+    "\nBoston Bunnies trimaran generated.\n"
+    "Print body deck-down (flip 180 deg about X in slicer).\n"
+    "Gain = vane hole / tiller hole distance; start ~6/18 = 0.33.\n")
+
+# To export STLs automatically, uncomment:
+# import Mesh, os
+# out = os.path.expanduser("~/BostonBunnies")
+# os.makedirs(out, exist_ok=True)
+# for o in doc.Objects:
+#     Mesh.export([o], os.path.join(out, o.Name + ".stl"))
