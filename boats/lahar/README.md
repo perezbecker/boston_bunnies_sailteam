@@ -13,21 +13,39 @@ wind vane driving the rudder. No electronics.
 | Path | What it is |
 |---|---|
 | [`cad/lahar.FCMacro`](cad/lahar.FCMacro) | Parametric FreeCAD macro — generates every printed part |
+| [`instructions.md`](instructions.md) | CORE One+ USB printing instructions, settings, and first-print caveats |
+| [`print/usb/`](print/usb/) | Two ready-sliced G-code jobs for a CORE One+, stock 0.4 mm high-flow nozzle, PLA, smooth PEI |
+| [`print/projects/`](print/projects/) | Editable PrusaSlicer projects with settings and side-float infill modifiers |
+| [`print/stl/`](print/stl/) | Five checked, print-oriented meshes in millimetres |
+| [`cad/export_print.py`](cad/export_print.py), [`cad/slice_print.py`](cad/slice_print.py) | Rebuild the meshes, projects, and printer files |
 | [`docs/design-spec.md`](docs/design-spec.md) | Design spec and build guide: dimensions, weight budget, rigging, tuning, BOM |
 | [`renders/`](renders/) | Reference renders |
 | [`versions/`](versions/) | Superseded iterations (empty — v1 is the first) |
 
-## Quick start
+## Print from a USB drive
 
-1. Open FreeCAD (0.20, 0.21 and 1.0 are tested) and go to **Macro → Macros… → Execute**,
+For the confirmed **Prusa CORE One+, stock 0.4 mm high-flow nozzle, PLA, and smooth
+PEI sheet**, use the two files in [print/usb](print/usb/) and follow
+[instructions.md](instructions.md). No further slicing is needed for that setup.
+The body takes about 4 h 27 min and steering about 1 h 20 min.
+
+These are **first-test files, not physically validated prints**. The hollow body
+still produces a PrusaSlicer "Floating bridge anchors" warning; read the guide's
+caveat and inspect its Preview before printing. The steering parts include
+removable supports. Assembly still needs the hardware and rig in the design spec.
+
+## Generate from CAD
+
+1. Open FreeCAD (the current export was checked with 1.1.3) and go to **Macro → Macros… → Execute**,
    pointing at `cad/lahar.FCMacro`.
 2. The macro builds five parts in a document named `Lahar_v1`:
    `Trimaran_Body`, `Rudder_Blade`, `Rudder_Tiller`, `Vane_Paddle`, `Vane_Arm`.
 3. Export them as STL. The macro has a commented-out export block at the bottom if
    you'd rather batch it.
 4. Slice the body **deck-down** — flip 180° about X. Everything on deck is a recess,
-   so it prints with no supports. Main hull at 4 % infill, amas at 0 % — they are
-   floats, and the weight budget assumes it.
+  so the intended orientation needs no external supports; internal bridging still
+  needs a test print. Main hull at 4 % infill, amas at 0 % — they are floats, and
+  the weight budget assumes it. The ready-made STLs are already flipped.
 5. Build the sail and rig from the [spec sheet](docs/design-spec.md); mast, yards,
    bearings and pushrod are off-the-shelf parts.
 

@@ -113,12 +113,21 @@ rudder stock at x = 172 mm, skeg immediately ahead of the rudder, all on centerl
 
 ## Printing
 
+For pre-sliced CORE One+ / stock 0.4 mm high-flow nozzle / PLA / smooth PEI jobs,
+see the [USB printing instructions](../instructions.md). These preserve the
+low-infill design but have not been physically printed. PrusaSlicer reports
+"Floating bridge anchors" inside the body; successful bridging and watertightness
+remain to be tested. The current measured mesh footprint is 200 x 197.29 mm,
+slightly wider than the nominal station-based figure because of loft interpolation.
+
 * **Body:** flip 180° about X in the slicer so the deck is on the bed. Beams then
   lie flat on the bed, all sockets print as simple recesses, no supports. Use
   0.12–0.16 mm layers for the last 5 mm of the hull crowns (the rounded bottoms
   close like a dome). 2 perimeters; **4 % infill in the main hull, 0 % in the amas** — the weight
   budget and ama clearance depend on these — 4 top layers for water-tightness.
-* **Rudder blade & vane paddle:** print lying flat on their sides.
+* **Rudder blade & vane paddle:** print lying flat on their sides, with supports
+  beneath surfaces lifted off the bed by their thicker bosses/spines. The supplied
+  steering project enables automatic snug supports from the build plate.
 * **Arms:** print flat as oriented.
 * PLA is fine for pond duty; seal the hull with a light acrylic spray if it seeps.
 

@@ -109,8 +109,13 @@ ROT_YZ = App.Rotation(Vector(1, 1, 1), 120)   # maps local X->Y, Y->Z (section
 
 def section_wire(x, half_beam, depth):
     """Closed wire at station x: lower half-ellipse + deck line."""
-    ell = Part.Ellipse(Vector(0, 0, 0), half_beam, depth)
-    arc = Part.ArcOfEllipse(ell, math.pi, 2 * math.pi).toShape()
+    if depth > half_beam:
+        ell = Part.Ellipse(Vector(0, 0, 0), depth, half_beam)
+        arc = Part.ArcOfEllipse(ell, math.pi / 2, 3 * math.pi / 2).toShape()
+        arc.rotate(Vector(0, 0, 0), Vector(0, 0, 1), 90)
+    else:
+        ell = Part.Ellipse(Vector(0, 0, 0), half_beam, depth)
+        arc = Part.ArcOfEllipse(ell, math.pi, 2 * math.pi).toShape()
     top = Part.makeLine(Vector(half_beam, 0, 0), Vector(-half_beam, 0, 0))
     w = Part.Wire([arc, top])
     w.Placement = App.Placement(Vector(x, 0, 0), ROT_YZ)
