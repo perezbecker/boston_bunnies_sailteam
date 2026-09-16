@@ -1,0 +1,50 @@
+{
+  "Steering": {
+    "file": "Lahar_v2_Steering_MK4S_PLA_04.gcode",
+    "estimated_time": "6h 4m 48s",
+    "filament_including_waste_g": 58.03,
+    "extruding_moves": 323413,
+    "support_moves": 14716,
+    "extrusion_min_mm": {
+      "X": 4.15,
+      "Y": 3.757,
+      "Z": 0.2
+    },
+    "extrusion_max_mm": {
+      "X": 247.751,
+      "Y": 205.243,
+      "Z": 25.85
+    },
+    "toolpath_sha256": "0c9a26ec82ac7df39d1f817987297de11de6feebc8659e4b26ccbe03153d9604",
+    "gcode_sha256": "6bae64e95701007d6246d3d2bf380748469bc0e8af1d804e882d5a36eb7e3e30",
+    "printer_preset": "Original Prusa MK4S HF0.4 nozzle",
+    "nozzle_temperature_c": "225",
+    "first_layer_temperature_c": "230",
+    "bed_temperature_c": "60",
+    "standalone_project_roundtrip": true
+  },
+  "Body": {
+    "file": "Lahar_v2_Body_MK4S_PLA_04.gcode",
+    "estimated_time": "1d 2h 3m 12s",
+    "filament_including_waste_g": 238.82,
+    "extruding_moves": 1370281,
+    "support_moves": 0,
+    "extrusion_min_mm": {
+      "X": 12.586,
+      "Y": 2.592,
+      "Z": 0.2
+    },
+    "extrusion_max_mm": {
+      "X": 237.414,
+      "Y": 206.82,
+      "Z": 65.15
+    },
+    "toolpath_sha256": "0a6f5f2f411da7e42bf159dc5da650e1f59362da699c643be5a37b98fe830adc",
+    "gcode_sha256": "43f5eaaff33c91b3cc34a68e83e1fc915000990d4a3febec85dda0c4a24a4db4",
+    "printer_preset": "Original Prusa MK4S HF0.4 nozzle",
+    "nozzle_temperature_c": "225",
+    "first_layer_temperature_c": "230",
+    "bed_temperature_c": "60",
+    "standalone_project_roundtrip": true
+  }
+}

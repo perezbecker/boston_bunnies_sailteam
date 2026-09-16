@@ -1,0 +1,502 @@
+{
+  "freecad_version": "1.1.3",
+  "printed_boat_parts": 15,
+  "minimum_skin_mm": {
+    "Main_Hull": 1.799999999999993,
+    "Port_Hull": 1.7999999999999965,
+    "Starboard_Hull": 1.7999999999999958
+  },
+  "body_single_solid": true,
+  "body_print_rotation_x_deg": 180.0,
+  "internal_rib_pitch_mm": 12.0,
+  "maximum_internal_cell_span_mm": {
+    "Main_Hull": 11.100000400000141,
+    "Port_Hull": 11.100000400000106,
+    "Starboard_Hull": 11.100000400000098
+  },
+  "closed_internal_cells": {
+    "Main_Hull": 18,
+    "Port_Hull": 14,
+    "Starboard_Hull": 14
+  },
+  "outer_shell_and_cells_closed": true,
+  "roof_final_gap_mm": 0.6,
+  "steering_mount_guides": {
+    "Vane_Stand": {
+      "keys_xy_width_depth_mm": [
+        [
+          149.0,
+          -3.0,
+          3.0,
+          5.0
+        ],
+        [
+          159.0,
+          3.0,
+          5.0,
+          3.0
+        ]
+      ],
+      "minimum_backing_mm": 1.8,
+      "side_clearance_mm": 0.25,
+      "vertical_clearance_mm": 0.20000000000000007,
+      "reversed_mount_rejected": true,
+      "swapped_mount_rejected": true
+    },
+    "Rudder_Stand": {
+      "keys_xy_width_depth_mm": [
+        [
+          198.0,
+          3.0,
+          4.0,
+          5.0
+        ],
+        [
+          209.0,
+          -3.0,
+          6.0,
+          3.0
+        ]
+      ],
+      "minimum_backing_mm": 1.8,
+      "side_clearance_mm": 0.25,
+      "vertical_clearance_mm": 0.20000000000000007,
+      "reversed_mount_rejected": true,
+      "swapped_mount_rejected": true
+    }
+  },
+  "vane_plate_thickness_mm": 1.0,
+  "yard_clamps": {
+    "Lower": {
+      "parts": 3,
+      "bolts": 4,
+      "bolt_size": "M2 x 16 socket cap",
+      "nuts": 4,
+      "rod_center_offset_mm": 7.399999999999999,
+      "split_gap_mm": 0.4,
+      "bolt_past_nut_mm": 0.5
+    },
+    "Upper": {
+      "parts": 3,
+      "bolts": 4,
+      "bolt_size": "M2 x 16 socket cap",
+      "nuts": 4,
+      "rod_center_offset_mm": 7.399999999999999,
+      "split_gap_mm": 0.4,
+      "bolt_past_nut_mm": 0.5
+    }
+  },
+  "solid_pla_boat_upper_bound_g": 277.6135542770845,
+  "rudder_full_sweep_clearance_mm": 10.709959061731416,
+  "neutral_gain": -0.33333333182667957,
+  "neutral_pin_distance_mm": 64.0,
+  "motion_samples": [
+    {
+      "vane_deg": -40,
+      "rudder_deg": 12.54361
+    },
+    {
+      "vane_deg": -38,
+      "rudder_deg": 11.98328
+    },
+    {
+      "vane_deg": -36,
+      "rudder_deg": 11.41345
+    },
+    {
+      "vane_deg": -34,
+      "rudder_deg": 10.83448
+    },
+    {
+      "vane_deg": -32,
+      "rudder_deg": 10.24675
+    },
+    {
+      "vane_deg": -30,
+      "rudder_deg": 9.65061
+    },
+    {
+      "vane_deg": -28,
+      "rudder_deg": 9.04646
+    },
+    {
+      "vane_deg": -26,
+      "rudder_deg": 8.43469
+    },
+    {
+      "vane_deg": -24,
+      "rudder_deg": 7.81572
+    },
+    {
+      "vane_deg": -22,
+      "rudder_deg": 7.18996
+    },
+    {
+      "vane_deg": -20,
+      "rudder_deg": 6.55785
+    },
+    {
+      "vane_deg": -18,
+      "rudder_deg": 5.91987
+    },
+    {
+      "vane_deg": -16,
+      "rudder_deg": 5.27648
+    },
+    {
+      "vane_deg": -14,
+      "rudder_deg": 4.62819
+    },
+    {
+      "vane_deg": -12,
+      "rudder_deg": 3.97552
+    },
+    {
+      "vane_deg": -10,
+      "rudder_deg": 3.31902
+    },
+    {
+      "vane_deg": -8,
+      "rudder_deg": 2.65927
+    },
+    {
+      "vane_deg": -6,
+      "rudder_deg": 1.99685
+    },
+    {
+      "vane_deg": -4,
+      "rudder_deg": 1.33239
+    },
+    {
+      "vane_deg": -2,
+      "rudder_deg": 0.66655
+    },
+    {
+      "vane_deg": 0,
+      "rudder_deg": 0.0
+    },
+    {
+      "vane_deg": 2,
+      "rudder_deg": -0.66655
+    },
+    {
+      "vane_deg": 4,
+      "rudder_deg": -1.33235
+    },
+    {
+      "vane_deg": 6,
+      "rudder_deg": -1.99666
+    },
+    {
+      "vane_deg": 8,
+      "rudder_deg": -2.65866
+    },
+    {
+      "vane_deg": 10,
+      "rudder_deg": -3.31756
+    },
+    {
+      "vane_deg": 12,
+      "rudder_deg": -3.97249
+    },
+    {
+      "vane_deg": 14,
+      "rudder_deg": -4.62259
+    },
+    {
+      "vane_deg": 16,
+      "rudder_deg": -5.26697
+    },
+    {
+      "vane_deg": 18,
+      "rudder_deg": -5.9047
+    },
+    {
+      "vane_deg": 20,
+      "rudder_deg": -6.53486
+    },
+    {
+      "vane_deg": 22,
+      "rudder_deg": -7.15649
+    },
+    {
+      "vane_deg": 24,
+      "rudder_deg": -7.76861
+    },
+    {
+      "vane_deg": 26,
+      "rudder_deg": -8.37026
+    },
+    {
+      "vane_deg": 28,
+      "rudder_deg": -8.96044
+    },
+    {
+      "vane_deg": 30,
+      "rudder_deg": -9.53816
+    },
+    {
+      "vane_deg": 32,
+      "rudder_deg": -10.10243
+    },
+    {
+      "vane_deg": 34,
+      "rudder_deg": -10.65225
+    },
+    {
+      "vane_deg": 36,
+      "rudder_deg": -11.18664
+    },
+    {
+      "vane_deg": 38,
+      "rudder_deg": -11.70463
+    },
+    {
+      "vane_deg": 40,
+      "rudder_deg": -12.20526
+    }
+  ],
+  "hardware_assumption": "8 mm OD clevis barrel 8-23 mm from pin; fork gap unverified",
+  "parts": {
+    "Trimaran_Body": {
+      "job": "Body",
+      "triangles": 97778,
+      "volume_mm3": 193366.8592103162,
+      "centroid_mm": [
+        114.53257007532025,
+        0.0005769137048529113,
+        -17.85810614401113
+      ],
+      "print_bounds_mm": [
+        220.0,
+        199.40866088867188,
+        65.19999694824219
+      ]
+    },
+    "Vane_Stand": {
+      "job": "Steering",
+      "triangles": 3072,
+      "volume_mm3": 2176.665603865136,
+      "centroid_mm": [
+        152.85788238736285,
+        1.5227410041732243,
+        9.683100292957425
+      ],
+      "print_bounds_mm": [
+        28.25897216796875,
+        27.644224166870117,
+        25.899999618530273
+      ]
+    },
+    "Rudder_Stand": {
+      "job": "Steering",
+      "triangles": 3106,
+      "volume_mm3": 3528.17183674608,
+      "centroid_mm": [
+        217.06454302764485,
+        1.018775618287145,
+        8.51334731265206
+      ],
+      "print_bounds_mm": [
+        47.0,
+        28.05792808532715,
+        25.899999618530273
+      ]
+    },
+    "Rudder_Tiller": {
+      "job": "Steering",
+      "triangles": 2128,
+      "volume_mm3": 559.5085557050213,
+      "centroid_mm": [
+        223.17451902168216,
+        14.433974637757132,
+        25.555616615123373
+      ],
+      "print_bounds_mm": [
+        32.39988708496094,
+        40.79999923706055,
+        6.0
+      ]
+    },
+    "Vane_Arm": {
+      "job": "Steering",
+      "triangles": 2560,
+      "volume_mm3": 559.2234257370767,
+      "centroid_mm": [
+        152.33782130040805,
+        2.2162382661226467,
+        25.55584891932396
+      ],
+      "print_bounds_mm": [
+        33.600006103515625,
+        42.0,
+        6.0
+      ]
+    },
+    "Vane_Spacer": {
+      "job": "Steering",
+      "triangles": 840,
+      "volume_mm3": 31.51645750081272,
+      "centroid_mm": [
+        153.99999999999997,
+        1.2384618752933365e-16,
+        22.000000000000004
+      ],
+      "print_bounds_mm": [
+        4.399017333984375,
+        4.399507522583008,
+        4.400001525878906
+      ]
+    },
+    "Rudder_Spacer": {
+      "job": "Steering",
+      "triangles": 840,
+      "volume_mm3": 31.51645750081272,
+      "centroid_mm": [
+        234.00000000000006,
+        8.271453597966594e-17,
+        22.000000000000004
+      ],
+      "print_bounds_mm": [
+        4.399017333984375,
+        4.399507522583008,
+        4.400001525878906
+      ]
+    },
+    "Rudder_Blade": {
+      "job": "Steering",
+      "triangles": 910,
+      "volume_mm3": 2002.6883232471425,
+      "centroid_mm": [
+        237.18272217306642,
+        -2.079354765581818e-15,
+        -41.3477105917078
+      ],
+      "print_bounds_mm": [
+        24.0,
+        52.0,
+        7.999104976654053
+      ]
+    },
+    "Vane_Frame": {
+      "job": "Steering",
+      "triangles": 1720,
+      "volume_mm3": 8327.337911697681,
+      "centroid_mm": [
+        127.60166757093664,
+        -5.155813356166872e-17,
+        81.51982547048127
+      ],
+      "print_bounds_mm": [
+        174.0,
+        99.0,
+        5.799351215362549
+      ]
+    },
+    "Lower_Yard_Yard_Cap": {
+      "job": "Steering",
+      "triangles": 3592,
+      "volume_mm3": 1864.3316512211898,
+      "centroid_mm": [
+        60.1446983482407,
+        -4.022529662571201e-17,
+        40.0
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        4.400001525878906
+      ]
+    },
+    "Lower_Yard_Saddle": {
+      "job": "Steering",
+      "triangles": 2120,
+      "volume_mm3": 2832.8834937960623,
+      "centroid_mm": [
+        66.18278094791557,
+        -2.396546464268287e-16,
+        40.000000000000014
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        7.000003814697266
+      ]
+    },
+    "Lower_Yard_Mast_Cap": {
+      "job": "Steering",
+      "triangles": 2016,
+      "volume_mm3": 1951.9902691007726,
+      "centroid_mm": [
+        72.83356875858132,
+        -1.0873486291392608e-16,
+        40.00000000000001
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        5.0
+      ]
+    },
+    "Upper_Yard_Yard_Cap": {
+      "job": "Steering",
+      "triangles": 3592,
+      "volume_mm3": 1864.331651221192,
+      "centroid_mm": [
+        60.1446983482407,
+        9.6052883340811e-17,
+        210.00000000000006
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        4.400001525878906
+      ]
+    },
+    "Upper_Yard_Saddle": {
+      "job": "Steering",
+      "triangles": 2120,
+      "volume_mm3": 2832.883493796065,
+      "centroid_mm": [
+        66.18278094791559,
+        -1.4613726765450666e-16,
+        209.99999999999997
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        7.000003814697266
+      ]
+    },
+    "Upper_Yard_Mast_Cap": {
+      "job": "Steering",
+      "triangles": 2016,
+      "volume_mm3": 1951.9902691007728,
+      "centroid_mm": [
+        72.8335687585814,
+        -1.575021179302846e-16,
+        209.99999999999997
+      ],
+      "print_bounds_mm": [
+        22.0,
+        22.0,
+        5.0
+      ]
+    },
+    "Hardware_Fit_Coupon": {
+      "job": "Steering",
+      "triangles": 4712,
+      "volume_mm3": 6913.518142845682,
+      "centroid_mm": [
+        31.465242412560546,
+        13.034272418021315,
+        2.4792616033244435
+      ],
+      "print_bounds_mm": [
+        62.0,
+        40.0,
+        5.5
+      ]
+    }
+  }
+}

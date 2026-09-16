@@ -1,0 +1,440 @@
+{
+  "mass_budget": {
+    "components": [
+      {
+        "name": "Trimaran_Body",
+        "mass_g": 239.7749054207921,
+        "position_mm": [
+          114.53257007532025,
+          0.0005769137048529113,
+          -17.85810614401113
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Vane_Stand",
+        "mass_g": 2.6990653487927685,
+        "position_mm": [
+          152.85788238736285,
+          1.5227410041732243,
+          9.683100292957425
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Rudder_Stand",
+        "mass_g": 4.374933077565139,
+        "position_mm": [
+          217.06454302764485,
+          1.018775618287145,
+          8.51334731265206
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Rudder_Tiller",
+        "mass_g": 0.6937906090742264,
+        "position_mm": [
+          223.17451902168216,
+          14.433974637757132,
+          25.555616615123373
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Vane_Arm",
+        "mass_g": 0.6934370479139751,
+        "position_mm": [
+          152.33782130040805,
+          2.2162382661226467,
+          25.55584891932396
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Vane_Spacer",
+        "mass_g": 0.03908040730100777,
+        "position_mm": [
+          153.99999999999997,
+          1.2384618752933365e-16,
+          22.000000000000004
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Rudder_Spacer",
+        "mass_g": 0.03908040730100777,
+        "position_mm": [
+          234.00000000000006,
+          8.271453597966594e-17,
+          22.000000000000004
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Rudder_Blade",
+        "mass_g": 2.4833335208264566,
+        "position_mm": [
+          237.18272217306642,
+          -2.079354765581818e-15,
+          -41.3477105917078
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Vane_Frame",
+        "mass_g": 10.325899010505125,
+        "position_mm": [
+          127.60166757093664,
+          -5.155813356166872e-17,
+          81.51982547048127
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Lower_Yard_Yard_Cap",
+        "mass_g": 2.311771247514275,
+        "position_mm": [
+          60.1446983482407,
+          -4.022529662571201e-17,
+          40.0
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Lower_Yard_Saddle",
+        "mass_g": 3.5127755323071175,
+        "position_mm": [
+          66.18278094791557,
+          -2.396546464268287e-16,
+          40.000000000000014
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Lower_Yard_Mast_Cap",
+        "mass_g": 2.420467933684958,
+        "position_mm": [
+          72.83356875858132,
+          -1.0873486291392608e-16,
+          40.00000000000001
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Upper_Yard_Yard_Cap",
+        "mass_g": 2.311771247514278,
+        "position_mm": [
+          60.1446983482407,
+          9.6052883340811e-17,
+          210.00000000000006
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Upper_Yard_Saddle",
+        "mass_g": 3.5127755323071206,
+        "position_mm": [
+          66.18278094791559,
+          -1.4613726765450666e-16,
+          209.99999999999997
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "Upper_Yard_Mast_Cap",
+        "mass_g": 2.420467933684958,
+        "position_mm": [
+          72.8335687585814,
+          -1.575021179302846e-16,
+          209.99999999999997
+        ],
+        "basis": "CAD volume at 1.24 g/cm3; not weighed"
+      },
+      {
+        "name": "6 mm hardwood mast",
+        "mass_g": 4.594579255875073,
+        "position_mm": [
+          70.0,
+          0,
+          102.2
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Two 4 mm hardwood yards",
+        "mass_g": 3.4306191777200543,
+        "position_mm": [
+          62.6,
+          0,
+          125
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "190 x 170 mm sail, 30 g/m2",
+        "mass_g": 0.9690000000000001,
+        "position_mm": [
+          57.0,
+          0,
+          125
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Lower yard four M2 x 16 bolts and four nuts",
+        "mass_g": 2.8,
+        "position_mm": [
+          66.6,
+          0,
+          40.0
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Upper yard four M2 x 16 bolts and four nuts",
+        "mass_g": 2.8,
+        "position_mm": [
+          66.6,
+          0,
+          210.0
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Two 623ZZ bearings",
+        "mass_g": 3.4,
+        "position_mm": [
+          194.0,
+          0,
+          17.8
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "134 mm of 3 mm carbon stock",
+        "mass_g": 1.5155042960917162,
+        "position_mm": [
+          196.98507462686567,
+          0,
+          13.119402985074627
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "45 mm M2 rod, two clevises and screws",
+        "mass_g": 6.0,
+        "position_mm": [
+          180,
+          7,
+          25.1
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Vane fore-aft balance screw and nuts",
+        "mass_g": 3.0,
+        "position_mm": [
+          244.8621715694169,
+          0,
+          83
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Lateral vane balance nuts allowance",
+        "mass_g": 1.5,
+        "position_mm": [
+          139.6,
+          19.200000000000003,
+          24.2
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Rigging thread and sail attachment",
+        "mass_g": 0.7,
+        "position_mm": [
+          90,
+          0,
+          90
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      },
+      {
+        "name": "Adhesive and seal coat allowance",
+        "mass_g": 10.0,
+        "position_mm": [
+          110,
+          0,
+          -10
+        ],
+        "basis": "Planning assumption; replace with measured value"
+      }
+    ],
+    "nominal_all_up_g": 318.32325700677137,
+    "nominal_cg_mm": [
+      116.89946264509125,
+      0.28604997539880284,
+      2.569042598336785
+    ],
+    "printed_cad_mass_g": 277.6135542770845,
+    "boat_jobs_filament_with_waste_g": 288.2772375028714,
+    "all_jobs_filament_with_waste_g": 296.85,
+    "coupon_cad_mass_excluded_g": 8.572762497128645,
+    "conservative_all_up_g": 328.98694023255825,
+    "note": "The coupon's CAD mass is excluded even though it shares the steering job. The conservative case counts all remaining supports/brims as boat mass. Hardware and adhesive masses are assumptions."
+  },
+  "upright_cases": [
+    {
+      "mass_g": 318.32325700677137,
+      "heel_deg": 0.0,
+      "waterline_at_x110_mm": -14.813914289405078,
+      "trim_stern_down_deg": -1.1131330346203892,
+      "minimum_deck_freeboard_mm": 13.876760253883687,
+      "ama_bottom_clearance_mm": -0.7410111429845152,
+      "longitudinal_balance_error_mm": 4.2290082546969643e-10,
+      "displacement_error_g": 1.0109033610206097e-09,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": 0.89326717177227,
+      "solver_evaluations": 5
+    },
+    {
+      "mass_g": 328.98694023255825,
+      "heel_deg": 0.0,
+      "waterline_at_x110_mm": -13.959085955980685,
+      "trim_stern_down_deg": -0.9603065681510048,
+      "minimum_deck_freeboard_mm": 13.315347469534688,
+      "ama_bottom_clearance_mm": -1.58515998669262,
+      "longitudinal_balance_error_mm": 2.3021584638627246e-11,
+      "displacement_error_g": 8.081428859441075e-10,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": 0.9232041092594361,
+      "solver_evaluations": 5
+    },
+    {
+      "mass_g": 350,
+      "heel_deg": 0.0,
+      "waterline_at_x110_mm": -12.411349926804373,
+      "trim_stern_down_deg": -0.6519826543613594,
+      "minimum_deck_freeboard_mm": 12.359582410406965,
+      "ama_bottom_clearance_mm": -3.115996861120566,
+      "longitudinal_balance_error_mm": 2.842170943040401e-14,
+      "displacement_error_g": 5.684341886080802e-14,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": 0.9822681173845162,
+      "solver_evaluations": 6
+    }
+  ],
+  "heel_cases": [
+    {
+      "mass_g": 328.98694023255825,
+      "heel_deg": -10,
+      "waterline_at_x110_mm": -16.552637206377497,
+      "trim_stern_down_deg": -0.43959258044422117,
+      "minimum_deck_freeboard_mm": 0.3739802263933534,
+      "ama_bottom_clearance_mm": -13.39871796016017,
+      "longitudinal_balance_error_mm": 2.5011104298755527e-12,
+      "displacement_error_g": 6.480149750132114e-12,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": -13.010687722013577,
+      "solver_evaluations": 5
+    },
+    {
+      "mass_g": 328.98694023255825,
+      "heel_deg": -5,
+      "waterline_at_x110_mm": -14.915325849131476,
+      "trim_stern_down_deg": -0.7175830879273939,
+      "minimum_deck_freeboard_mm": 7.1686857505642845,
+      "ama_bottom_clearance_mm": -7.84972563296691,
+      "longitudinal_balance_error_mm": 5.130118552187923e-12,
+      "displacement_error_g": -1.1050360626541078e-10,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": -3.0052724554577277,
+      "solver_evaluations": 5
+    },
+    {
+      "mass_g": 328.98694023255825,
+      "heel_deg": 5,
+      "waterline_at_x110_mm": -14.915322329058283,
+      "trim_stern_down_deg": -0.7182486741283961,
+      "minimum_deck_freeboard_mm": 7.168192287837557,
+      "ama_bottom_clearance_mm": -7.852561480461754,
+      "longitudinal_balance_error_mm": 4.192202140984591e-12,
+      "displacement_error_g": -1.0976464182022028e-10,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": 4.844831261523841,
+      "solver_evaluations": 5
+    },
+    {
+      "mass_g": 328.98694023255825,
+      "heel_deg": 10,
+      "waterline_at_x110_mm": -16.552651699401462,
+      "trim_stern_down_deg": -0.4403358543452807,
+      "minimum_deck_freeboard_mm": 0.37382546732522925,
+      "ama_bottom_clearance_mm": -13.398716694946785,
+      "longitudinal_balance_error_mm": 2.4158453015843406e-12,
+      "displacement_error_g": 6.480149750132114e-12,
+      "solver_tolerance_g_mm": [
+        0.05,
+        0.05
+      ],
+      "restoring_moment_Nmm": 14.828866080110727,
+      "solver_evaluations": 5
+    }
+  ],
+  "loading_check_g": 350,
+  "hydrostatics_method": "CAD-derived 0.04 mm deflection meshes; trimesh capped waterplane clipping; scipy bounded least-squares equilibrium",
+  "hydrostatics_note": "Sealed hull envelopes in fresh water; appendage buoyancy omitted conservatively. Loads use the nominal CG. No waves, leakage, sail force or dynamic validation.",
+  "steering": {
+    "solid_vane_area_mm2": 6144.0,
+    "vane_center_lever_mm": 40.0,
+    "printed_vane_mass_g": 10.325899010505125,
+    "printed_vane_fore_aft_moment_g_mm": 272.5865147082507,
+    "paddle_only_counterweight_3g_position_mm": 90.8621715694169,
+    "counterweight_slot_mm": [
+      35.0,
+      95.0
+    ],
+    "balance_note": "Paddle-only static moment; rebalance with stock, arm and clevis connected. Budget includes 3 g fore-aft hardware plus 1.5 g lateral nuts.",
+    "v1_area_lever_improvement": 4.514991181657849,
+    "vane_torque_at_10deg_Nmm": {
+      "0.5": 0.013069456443923846,
+      "0.75": 0.029406276998828654,
+      "1.0": 0.05227782577569538,
+      "1.5": 0.11762510799531462,
+      "2.0": 0.20911130310278153
+    },
+    "friction_acceptance_target_at_vane_Nmm": 0.01,
+    "rudder_force_at_0_6mps_N": 0.02501379303775732,
+    "required_vane_torque_for_1_2_6mm_hinge_offset_Nmm": [
+      0.018337931012585774,
+      0.026675862025171547,
+      0.06002758607551464
+    ],
+    "apparent_wind_break_even_mps_for_1_2_6mm_offset": [
+      0.5922654637586834,
+      0.7143326036576088,
+      1.0715604625946866
+    ],
+    "assumptions": "Illustrative, not measured: air CN=2sin(error), water lift slope=2.5/rad, 0.6 m/s boat speed, hinge offset 1-6 mm, 0.010 Nmm breakaway friction. Low-Reynolds-number behavior is uncertain; these are not guaranteed thresholds."
+  }
+}
