@@ -1,0 +1,47 @@
+{
+  "mesh_source_sha256": "d1433637a9026a7eb74321a82358ab2809677dece472079e94ae8158e2b0a8b6",
+  "images": {
+    "assembly-details.png": {
+      "sha256": "9209cc1600092be0e26da85f9c4c90113c60ef48e667d04147749cdd81588a0c",
+      "pixels": [
+        2720,
+        1600
+      ]
+    },
+    "hero.png": {
+      "sha256": "426cf64c3da95cd93561cb472682450e38fbc92facb50edc3292b5144dd82069",
+      "pixels": [
+        2400,
+        1600
+      ]
+    },
+    "hull-section.png": {
+      "sha256": "cf91f3cb80b65877d434b8f814cc47cfa2f00f9342d48a7c82eceeb91e60f988",
+      "pixels": [
+        2400,
+        1280
+      ]
+    },
+    "one-piece-body.png": {
+      "sha256": "037cf7fa5b5bd32b8fc3697d36693e9ea81c84862b861ea75cbdede529c3346c",
+      "pixels": [
+        2400,
+        1600
+      ]
+    },
+    "print-layouts.png": {
+      "sha256": "c4aa435a1e7fc933397f1bdcc0937893fba986b717320b865e02ac18526f5ba9",
+      "pixels": [
+        2560,
+        1280
+      ]
+    },
+    "steering-gear.png": {
+      "sha256": "6ec1ba3ecd3f051da219f79cb1eeba839db23fb8f1b81f98f5c36d0f009a16f8",
+      "pixels": [
+        2400,
+        1600
+      ]
+    }
+  }
+}

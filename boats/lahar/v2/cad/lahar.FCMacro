@@ -1,0 +1,445 @@
+"""Lahar v2: one-piece rounded trimaran and low-load downwind steering.
+
+Millimetres. X increases from bow to stern, Y to starboard, Z upward.
+Deck is Z=1.2. Print the complete body deck-down, rotated 180 degrees about X.
+"""
+
+import math
+
+import FreeCAD as App
+import Part
+from FreeCAD import Vector
+
+
+VERSION = 2
+WALL = 1.8
+CROWN_ALLOWANCE = 0.6
+DECK_Z = 1.2
+MAIN_X = [0.0, 16.5, 44.0, 92.0, 138.0, 180.0, 203.5, 220.0]
+MAIN_B = [1.0, 10.0, 25.0, 38.0, 39.0, 29.0, 13.0, 1.0]
+MAIN_D = [4.2, 23.0, 41.7, 58.4, 64.0, 50.0, 27.8, 4.2]
+AMA_X = [22.0, 49.0, 90.0, 132.0, 173.0, 200.0]
+AMA_B = [0.7, 9.8, 16.0, 16.0, 9.8, 0.7]
+AMA_D = [1.6, 10.0, 16.0, 16.0, 10.0, 1.6]
+AMA_OFFSET = 83.0
+CAVITY_X_SCALE = 0.94
+AMA_CAVITY_X_SCALE = 0.88
+CAVITY_BEAM_SCALE = 0.94
+AMA_CAVITY_BEAM_SCALE = 0.86
+RIB_THICKNESS = 0.9
+RIB_PITCH = 12.0
+CAVITY_ROOF_FRACTION = 0.95
+CAVITY_ROOF_GAP = 0.6
+MAST_X = 70.0
+MAST_DIAMETER = 6.4
+MAST_DEPTH = 24.0
+MAST_CLAMP_DIAMETER = 6.2
+YARD_CLAMP_DIAMETER = 4.2
+YARD_AXIS_X = MAST_X - 7.4
+YARD_LEVELS = [40.0, 210.0]
+CLAMP_WIDTH = 22.0
+CLAMP_SPLIT_GAP = 0.4
+CLAMP_FRONT_X = YARD_AXIS_X - 4.6
+CLAMP_REAR_X = MAST_X + 5.2
+CLAMP_BOLT_PITCH = 14.0
+CLAMP_BOLT_HOLE = 2.3
+CLAMP_BOLT_LENGTH = 16.0
+CLAMP_HEAD_DIAMETER = 4.2
+CLAMP_HEAD_DEPTH = 1.5
+CLAMP_NUT_AF = 4.2
+CLAMP_NUT_DEPTH = 1.8
+BEAM_X = [60.0, 132.0]
+BEAM_WIDTH = 12.0
+BEAM_SPAN = 180.0
+BEAM_THICKNESS = 6.0
+RUDDER_X = 234.0
+VANE_X = 154.0
+GUIDE_DEPTH = 0.8
+GUIDE_FOOT_HEIGHT = 0.6
+GUIDE_SIDE_CLEARANCE = 0.25
+MOUNT_KEYS = {
+    "Vane_Stand": [(149.0, -3.0, 3.0, 5.0), (159.0, 3.0, 5.0, 3.0)],
+    "Rudder_Stand": [(198.0, 3.0, 4.0, 5.0), (209.0, -3.0, 6.0, 3.0)],
+}
+BEARING_OD = 10.2
+BEARING_DEPTH = 4.2
+BEARING_TOP = 20.0
+STOCK_SOCKET = 3.2
+LOWER_GUIDE = 3.8
+ARM_Z = 24.2
+TAB_THICKNESS = 1.8
+PIN_DIAMETER = 2.3
+VANE_HOLES = [12.0, 15.0, 18.0]
+TILLER_HOLES = [30.0, 36.0, 42.0]
+VANE_RADIUS = 12.0
+TILLER_RADIUS = 36.0
+ARM_INDEX = math.degrees(math.asin((VANE_RADIUS + TILLER_RADIUS) / (RUDDER_X - VANE_X)))
+RUDDER_CHORD = 24.0
+RUDDER_PIVOT_FRACTION = 0.25
+RUDDER_TOP = -28.0
+RUDDER_BOTTOM = -68.0
+RUDDER_LIMIT = 25.0
+VANE_LIMIT = 40.0
+VANE_WIDTH = 64.0
+VANE_HEIGHT = 96.0
+VANE_LEVER = 40.0
+VANE_PLATE_THICKNESS = 1.0
+COUNTERWEIGHT_ARM_LENGTH = 101.0
+COUNTERWEIGHT_SLOT_START = 35.0
+COUNTERWEIGHT_SLOT_END = 95.0
+
+
+def cylinder(diameter, height, base):
+    return Part.makeCylinder(diameter / 2.0, height, Vector(*base))
+
+
+def mount_key_shapes(name, inset, depth):
+    return [Part.makeBox(width + 2 * inset, breadth + 2 * inset, depth,
+                          Vector(position - width / 2 - inset, lateral - breadth / 2 - inset, DECK_Z - depth))
+            for position, lateral, width, breadth in MOUNT_KEYS[name]]
+
+
+def hex_prism(across_flats, depth, base):
+    radius = across_flats / math.sqrt(3)
+    vertices = [Vector(base[0], base[1] + radius * math.cos(math.radians(angle)),
+                       base[2] + radius * math.sin(math.radians(angle)))
+                for angle in range(0, 360, 60)]
+    return Part.Face(Part.makePolygon(vertices + [vertices[0]])).extrude(Vector(depth, 0, 0))
+
+
+def section_wire(position, half_beam, depth):
+    if depth > half_beam:
+        ellipse = Part.Ellipse(Vector(), depth, half_beam)
+        arc = Part.ArcOfEllipse(ellipse, math.pi / 2, 3 * math.pi / 2).toShape()
+        arc.rotate(Vector(), Vector(0, 0, 1), 90)
+    else:
+        ellipse = Part.Ellipse(Vector(), half_beam, depth)
+        arc = Part.ArcOfEllipse(ellipse, math.pi, 2 * math.pi).toShape()
+    deck = Part.makeLine(Vector(half_beam, 0, 0), Vector(-half_beam, 0, 0))
+    wire = Part.Wire([arc, deck])
+    wire.Placement = App.Placement(Vector(position, 0, DECK_Z), App.Rotation(Vector(1, 1, 1), 120))
+    return wire
+
+
+def rounded_hull(stations, beams, depths, center_y):
+    profiles = [section_wire(position, beam, depth)
+                for position, beam, depth in zip(stations, beams, depths)]
+    shape = Part.makeLoft(profiles, True, False)
+    shape.translate(Vector(0, center_y, 0))
+    return shape
+
+
+doc = App.newDocument("Lahar_v2")
+parts = {}
+envelopes = {}
+cavities = {}
+minimum_skins = {}
+deck_edges = []
+
+
+def add_part(name, shape, job, rotation=0.0, color=(0.12, 0.62, 0.59)):
+    shape = shape.removeSplitter()
+    if not shape.isValid() or len(shape.Solids) != 1 or not shape.isClosed():
+        raise ValueError(f"{name}: expected one valid, closed CAD solid")
+    obj = doc.addObject("Part::Feature", name)
+    obj.Shape = shape
+    obj.addProperty("App::PropertyString", "PrintJob").PrintJob = job
+    obj.addProperty("App::PropertyFloat", "PrintRotationX").PrintRotationX = rotation
+    obj.addProperty("App::PropertyString", "Role").Role = "Printed"
+    obj.addProperty("App::PropertyString", "DisplayColor").DisplayColor = ",".join(map(str, color))
+    if App.GuiUp:
+        obj.ViewObject.ShapeColor = color
+    parts[name] = obj
+    return obj
+
+
+def make_hull(name, stations, beams, depths, center_y):
+    envelope = rounded_hull(stations, beams, depths, center_y)
+    center_x = (stations[0] + stations[-1]) / 2
+    matrix = App.Matrix()
+    matrix.A11 = CAVITY_X_SCALE if name == "Main_Hull" else AMA_CAVITY_X_SCALE
+    matrix.A22 = CAVITY_BEAM_SCALE if name == "Main_Hull" else AMA_CAVITY_BEAM_SCALE
+    matrix.A33 = (max(depths) - 2 * WALL - CROWN_ALLOWANCE) / max(depths)
+    matrix.A14 = center_x * (1 - matrix.A11)
+    matrix.A24 = center_y * (1 - matrix.A22)
+    matrix.A34 = DECK_Z * (1 - matrix.A33) - WALL
+    cavity = envelope.transformGeometry(matrix)
+    minimum_skin = cavity.distToShape(Part.makeCompound(envelope.Faces))[0]
+    if minimum_skin < WALL - 0.01:
+        raise ValueError(f"{name}: skin too thin ({minimum_skin:.3f} mm)")
+    if cavity.cut(envelope).Volume > 0.001:
+        raise ValueError(f"{name}: cavity escapes the outer hull")
+    envelopes[name] = envelope
+    minimum_skins[name] = minimum_skin
+    for face in envelope.Faces:
+        if abs(face.BoundBox.ZMin - DECK_Z) < 1e-6 and abs(face.BoundBox.ZMax - DECK_Z) < 1e-6:
+            deck_edges.extend(face.Edges)
+    rib_tools = [Part.makeBox(RIB_THICKNESS, 240, 90, Vector(position, -120, -80))
+                 for position in range(12, 220, int(RIB_PITCH))]
+    cavity = cavity.cut(Part.makeCompound(rib_tools))
+    cells = []
+    cavity_deck = DECK_Z - WALL
+    for cell in cavity.Solids:
+        bounds = cell.optimalBoundingBox()
+        roof_z = cavity_deck - CAVITY_ROOF_FRACTION * (cavity_deck - bounds.ZMin)
+        middle = (bounds.XMin + bounds.XMax) / 2
+        half_gap = min(CAVITY_ROOF_GAP, bounds.XLength) / 2
+        shoulder_z = roof_z + bounds.XLength / 2 - half_gap
+        roof_points = [Vector(bounds.XMin, -150, 10), Vector(bounds.XMax, -150, 10),
+                       Vector(bounds.XMax, -150, shoulder_z), Vector(middle + half_gap, -150, roof_z),
+                       Vector(middle - half_gap, -150, roof_z), Vector(bounds.XMin, -150, shoulder_z)]
+        roof_limit = Part.Face(Part.makePolygon(roof_points + [roof_points[0]])).extrude(Vector(0, 300, 0))
+        cells.append(cell.common(roof_limit))
+    cavity = Part.makeCompound(cells)
+    if name == "Main_Hull":
+        mast_well = cylinder(MAST_DIAMETER + 2 * WALL, MAST_DEPTH + WALL,
+                             (MAST_X, 0, DECK_Z - MAST_DEPTH - WALL))
+        cavity = cavity.cut(mast_well)
+        for mount in MOUNT_KEYS:
+            backing = mount_key_shapes(mount, GUIDE_SIDE_CLEARANCE + WALL, GUIDE_DEPTH + WALL)
+            cavity = cavity.cut(Part.makeCompound(backing))
+    cavities[name] = cavity
+
+
+make_hull("Main_Hull", MAIN_X, MAIN_B, MAIN_D, 0.0)
+make_hull("Port_Hull", AMA_X, AMA_B, AMA_D, -AMA_OFFSET)
+make_hull("Starboard_Hull", AMA_X, AMA_B, AMA_D, AMA_OFFSET)
+
+beams = [Part.makeBox(BEAM_WIDTH, BEAM_SPAN, BEAM_THICKNESS,
+                      Vector(position, -BEAM_SPAN / 2, DECK_Z - BEAM_THICKNESS))
+         for position in BEAM_X]
+for position in BEAM_X:
+    for side in (-1, 1):
+        for edge, end in ((position, position - 8), (position + BEAM_WIDTH, position + BEAM_WIDTH + 8)):
+            points = [Vector(edge, side * 23, DECK_Z - BEAM_THICKNESS),
+                      Vector(end, side * 23, DECK_Z - BEAM_THICKNESS),
+                      Vector(edge, side * 43, DECK_Z - BEAM_THICKNESS)]
+            beams.append(Part.Face(Part.makePolygon(points + [points[0]])).extrude(Vector(0, 0, BEAM_THICKNESS)))
+skeg_points = [Vector(150.0, -1.5, -10.0), Vector(184.0, -1.5, -10.0),
+               Vector(184.0, -1.5, -64.0), Vector(164.0, -1.5, -64.0)]
+skeg_face = Part.Face(Part.makePolygon(skeg_points + [skeg_points[0]]))
+skeg = skeg_face.extrude(Vector(0, 3.0, 0))
+body = envelopes["Main_Hull"].fuse([envelopes["Port_Hull"], envelopes["Starboard_Hull"], *beams, skeg])
+body = body.cut(Part.makeCompound(list(cavities.values())))
+body = body.cut(cylinder(MAST_DIAMETER, MAST_DEPTH + 0.1, (MAST_X, 0, DECK_Z - MAST_DEPTH)))
+for mount in MOUNT_KEYS:
+    body = body.cut(Part.makeCompound(mount_key_shapes(mount, GUIDE_SIDE_CLEARANCE, GUIDE_DEPTH)))
+add_part("Trimaran_Body", body, "Body", 180.0)
+parts["Trimaran_Body"].addProperty("App::PropertyLength", "MinimumSkin").MinimumSkin = min(minimum_skins.values())
+
+
+def bearing_head(position):
+    head = cylinder(14.0, 6.0, (position, 0, BEARING_TOP - 6.0))
+    head = head.cut(cylinder(BEARING_OD, BEARING_DEPTH + 0.1,
+                             (position, 0, BEARING_TOP - BEARING_DEPTH)))
+    return head.cut(cylinder(4.6, 6.2, (position, 0, BEARING_TOP - 6.1)))
+
+
+def stop_bridge(position, side, limit, contact_radius):
+    angle = math.radians(limit)
+    post_radius = 1.2
+    offset = (contact_radius * math.sin(angle) + 3.0 + post_radius) / math.cos(angle)
+    bridge = Part.makeBox(2 * (offset + post_radius), contact_radius - 4.0, 2.0,
+                          Vector(position - offset - post_radius,
+                                 6.0 if side > 0 else -contact_radius - 2.0, 14.0))
+    for sign in (-1, 1):
+        bridge = bridge.fuse(cylinder(2 * post_radius, ARM_Z + TAB_THICKNESS + 0.5 - 14.0,
+                                      (position + sign * offset, side * contact_radius, 14.0)))
+    bridge.rotate(Vector(position, 0, 0), Vector(0, 0, 1), ARM_INDEX)
+    return bridge
+
+
+vane_base = Part.makeBox(18.0, 18.0, 3.0, Vector(VANE_X - 9.0, -9.0, DECK_Z))
+vane_stand = vane_base.fuse(bearing_head(VANE_X))
+for side in (-1, 1):
+    vane_stand = vane_stand.fuse(Part.makeBox(
+        4.0, 3.0, 11.0, Vector(VANE_X - 2.0, side * 5.5 - 1.5, 3.2)))
+vane_stand = vane_stand.cut(cylinder(4.8, 1.8, (VANE_X, 0, DECK_Z)))
+vane_stand = vane_stand.cut(cylinder(LOWER_GUIDE, 4.0, (VANE_X, 0, DECK_Z)))
+vane_stand = vane_stand.fuse(stop_bridge(VANE_X, 1, VANE_LIMIT, 10.0))
+vane_stand = vane_stand.fuse(mount_key_shapes("Vane_Stand", 0.0, GUIDE_FOOT_HEIGHT))
+add_part("Vane_Stand", vane_stand, "Steering", 0.0, (0.24, 0.28, 0.30))
+
+rudder_base = Part.makeBox(20.0, 20.0, 3.0, Vector(194.0, -10.0, DECK_Z))
+rudder_stand = rudder_base.fuse(Part.makeBox(
+    RUDDER_X - 208.0 + 5.0, 8.0, 3.0, Vector(208.0, -4.0, DECK_Z)))
+for side in (-1, 1):
+    rudder_stand = rudder_stand.fuse(Part.makeBox(
+        5.0, 3.0, 11.0, Vector(202.0, side * 5.5 - 1.5, 3.2)))
+    rudder_stand = rudder_stand.fuse(Part.makeBox(
+        RUDDER_X - 202.0, 3.0, 3.0, Vector(202.0, side * 5.5 - 1.5, 12.0)))
+rudder_stand = rudder_stand.fuse(bearing_head(RUDDER_X))
+rudder_stand = rudder_stand.cut(cylinder(4.8, 1.8, (RUDDER_X, 0, DECK_Z)))
+rudder_stand = rudder_stand.cut(cylinder(LOWER_GUIDE, 4.0, (RUDDER_X, 0, DECK_Z)))
+rudder_stand = rudder_stand.fuse(stop_bridge(RUDDER_X, 1, RUDDER_LIMIT, 12.0))
+rudder_stand = rudder_stand.fuse(mount_key_shapes("Rudder_Stand", 0.0, GUIDE_FOOT_HEIGHT))
+add_part("Rudder_Stand", rudder_stand, "Steering", 0.0, (0.24, 0.28, 0.30))
+
+
+def make_arm(position, side, holes):
+    length = holes[-1] + 3.0
+    start = -length if side < 0 else 0.0
+    arm = Part.makeBox(6.0, length, TAB_THICKNESS, Vector(position - 3.0, start, ARM_Z))
+    arm = arm.fuse(cylinder(6.0, 6.0, (position, 0, ARM_Z)))
+    arm = arm.cut(cylinder(STOCK_SOCKET, 6.2, (position, 0, ARM_Z - 0.1)))
+    for radius in holes:
+        arm = arm.cut(cylinder(PIN_DIAMETER, TAB_THICKNESS + 0.2,
+                                (position, side * radius, ARM_Z - 0.1)))
+    arm.rotate(Vector(position, 0, 0), Vector(0, 0, 1), ARM_INDEX)
+    return arm
+
+
+add_part("Rudder_Tiller", make_arm(RUDDER_X, 1, TILLER_HOLES),
+         "Steering", 0.0, (0.88, 0.28, 0.22))
+vane_arm = make_arm(VANE_X, -1, VANE_HOLES)
+balance_ear = Part.makeBox(6.0, 27.0, TAB_THICKNESS, Vector(VANE_X - 3.0, 0, ARM_Z))
+balance_ear = balance_ear.cut(cylinder(3.2, TAB_THICKNESS + 0.2,
+                                      (VANE_X, 24.0, ARM_Z - 0.1)))
+balance_ear.rotate(Vector(VANE_X, 0, 0), Vector(0, 0, 1), ARM_INDEX)
+add_part("Vane_Arm", vane_arm.fuse(balance_ear), "Steering", 0.0, (0.88, 0.28, 0.22))
+for name, position in (("Vane_Spacer", VANE_X), ("Rudder_Spacer", RUDDER_X)):
+    spacer = cylinder(4.4, ARM_Z - 19.8, (position, 0, 19.8))
+    spacer = spacer.cut(cylinder(STOCK_SOCKET, ARM_Z - 19.8 + 0.2, (position, 0, 19.7)))
+    add_part(name, spacer, "Steering", 0.0, (0.88, 0.28, 0.22))
+
+leading_edge = -RUDDER_CHORD * RUDDER_PIVOT_FRACTION
+foil_profile = [(leading_edge, 0.25), (leading_edge + 2.0, 1.2),
+                (2.0, 1.0), (17.0, 0.4), (18.0, 0.2)]
+foil_points = [Vector(RUDDER_X + along, across, RUDDER_BOTTOM) for along, across in foil_profile]
+foil_points += [Vector(RUDDER_X + along, -across, RUDDER_BOTTOM)
+                for along, across in reversed(foil_profile)]
+rudder = Part.Face(Part.makePolygon(foil_points + [foil_points[0]])).extrude(
+    Vector(0, 0, RUDDER_TOP - RUDDER_BOTTOM))
+rudder = rudder.fuse(cylinder(8.0, 14.0, (RUDDER_X, 0, RUDDER_TOP - 2.0)))
+rudder = rudder.cut(cylinder(STOCK_SOCKET, 24.1, (RUDDER_X, 0, RUDDER_TOP - 12.0)))
+add_part("Rudder_Blade", rudder, "Steering", 90.0, (0.88, 0.28, 0.22))
+
+frame_start = VANE_X - 8.0 - VANE_WIDTH
+frame_bottom = 35.0
+frame = Part.makeBox(VANE_WIDTH, 1.2, VANE_HEIGHT, Vector(frame_start, -0.6, frame_bottom))
+frame = frame.cut(Part.makeBox(VANE_WIDTH - 4.0, 2.0, VANE_HEIGHT - 4.0,
+                               Vector(frame_start + 2.0, -1.0, frame_bottom + 2.0)))
+frame = frame.fuse(Part.makeBox(VANE_WIDTH, VANE_PLATE_THICKNESS, VANE_HEIGHT,
+                               Vector(frame_start, -VANE_PLATE_THICKNESS / 2, frame_bottom)))
+spine = Part.makeBox(4.0, 2.4, frame_bottom + VANE_HEIGHT - 32.0,
+                     Vector(VANE_X - 2.0, -1.2, 32.0))
+spine = spine.fuse(cylinder(5.8, 34.0, (VANE_X, 0, 32.0)))
+spine = spine.cut(cylinder(STOCK_SOCKET, 32.0, (VANE_X, 0, 32.0)))
+frame = frame.fuse(spine)
+for level in (frame_bottom, frame_bottom + VANE_HEIGHT - 2.0):
+    frame = frame.fuse(Part.makeBox(10.0, 2.4, 2.0, Vector(VANE_X - 8.0, -1.2, level)))
+counterweight = Part.makeBox(COUNTERWEIGHT_ARM_LENGTH, 5.0, 2.4, Vector(VANE_X + 1.0, -2.5, 81.8))
+slot = Part.makeBox(COUNTERWEIGHT_SLOT_END - COUNTERWEIGHT_SLOT_START, 3.2, 3.0,
+                    Vector(VANE_X + COUNTERWEIGHT_SLOT_START, -1.6, 81.5))
+for offset in (COUNTERWEIGHT_SLOT_START, COUNTERWEIGHT_SLOT_END):
+    slot = slot.fuse(cylinder(3.2, 3.0, (VANE_X + offset, 0, 81.5)))
+frame = frame.fuse(counterweight.cut(slot))
+add_part("Vane_Frame", frame, "Steering", 90.0, (0.88, 0.28, 0.22))
+
+
+def clamp_bolt_centers(level):
+    return [(side * CLAMP_BOLT_PITCH / 2, level + vertical * CLAMP_BOLT_PITCH / 2)
+            for side in (-1, 1) for vertical in (-1, 1)]
+
+
+def make_yard_clamp(prefix, level):
+    mast_cut = cylinder(MAST_CLAMP_DIAMETER, CLAMP_WIDTH + 2,
+                         (MAST_X, 0, level - CLAMP_WIDTH / 2 - 1))
+    yard_cut = Part.makeCylinder(YARD_CLAMP_DIAMETER / 2, CLAMP_WIDTH + 2,
+                                 Vector(YARD_AXIS_X, -CLAMP_WIDTH / 2 - 1, level), Vector(0, 1, 0))
+    sections = {
+        "Yard_Cap": (CLAMP_FRONT_X, YARD_AXIS_X - CLAMP_SPLIT_GAP / 2),
+        "Saddle": (YARD_AXIS_X + CLAMP_SPLIT_GAP / 2, MAST_X - CLAMP_SPLIT_GAP / 2),
+        "Mast_Cap": (MAST_X + CLAMP_SPLIT_GAP / 2, CLAMP_REAR_X),
+    }
+    for name, (start, end) in sections.items():
+        shape = Part.makeBox(end - start, CLAMP_WIDTH, CLAMP_WIDTH,
+                             Vector(start, -CLAMP_WIDTH / 2, level - CLAMP_WIDTH / 2))
+        shape = shape.cut(mast_cut).cut(yard_cut)
+        for lateral, height in clamp_bolt_centers(level):
+            through_hole = Part.makeCylinder(CLAMP_BOLT_HOLE / 2, CLAMP_REAR_X - CLAMP_FRONT_X + 2,
+                                              Vector(CLAMP_FRONT_X - 1, lateral, height), Vector(1, 0, 0))
+            shape = shape.cut(through_hole)
+            if name == "Yard_Cap":
+                head_seat = Part.makeCylinder(CLAMP_HEAD_DIAMETER / 2, CLAMP_HEAD_DEPTH + 0.1,
+                                               Vector(CLAMP_FRONT_X - 0.1, lateral, height), Vector(1, 0, 0))
+                shape = shape.cut(head_seat)
+            if name == "Mast_Cap":
+                nut_pocket = hex_prism(CLAMP_NUT_AF, CLAMP_NUT_DEPTH + 0.1,
+                                       (CLAMP_REAR_X - CLAMP_NUT_DEPTH, lateral, height))
+                shape = shape.cut(nut_pocket)
+        obj = add_part(f"{prefix}_Yard_{name}", shape, "Steering", color=(0.24, 0.28, 0.30))
+        obj.addProperty("App::PropertyFloat", "PrintRotationY").PrintRotationY = 90.0 if name != "Mast_Cap" else -90.0
+
+
+for prefix, level in zip(("Lower", "Upper"), YARD_LEVELS):
+    make_yard_clamp(prefix, level)
+
+coupon = Part.makeBox(62.0, 22.0, 5.5)
+for index, (diameter, thickness) in enumerate(zip((10.1, 10.2, 10.3), (1.5, 1.8, 2.1))):
+    position = 10.0 + 20.0 * index
+    coupon = coupon.cut(cylinder(diameter, 4.3, (position, 11.0, 1.3)))
+    coupon = coupon.cut(cylinder(3.8, 5.6, (position, 11.0, -0.05)))
+    tongue = Part.makeBox(7.5, 20.0, thickness, Vector(position - 3.75, 20.0, 0))
+    tongue = tongue.cut(cylinder(PIN_DIAMETER, thickness + 0.2, (position, 34.0, -0.1)))
+    coupon = coupon.fuse(tongue)
+coupon = coupon.cut(cylinder(6.4, 5.6, (20.0, 11.0, -0.05)))
+coupon = coupon.cut(cylinder(STOCK_SOCKET, 5.6, (40.0, 11.0, -0.05)))
+add_part("Hardware_Fit_Coupon", coupon, "Steering", 0.0, (0.55, 0.56, 0.58))
+
+
+def add_reference(name, shape, color):
+    obj = doc.addObject("Part::Feature", name)
+    obj.Shape = shape
+    obj.addProperty("App::PropertyString", "Role").Role = "Reference - do not print"
+    obj.addProperty("App::PropertyString", "DisplayColor").DisplayColor = ",".join(map(str, color))
+    if App.GuiUp:
+        obj.ViewObject.ShapeColor = color
+    return obj
+
+
+for name, position in (("Vane", VANE_X), ("Rudder", RUDDER_X)):
+    bearing = cylinder(10.0, 4.0, (position, 0, 15.8)).cut(cylinder(3.0, 4.2, (position, 0, 15.7)))
+    add_reference(f"{name}_623ZZ_Reference", bearing, (0.65, 0.69, 0.71))
+add_reference("Vane_Stock_Reference", cylinder(3.0, 62.0, (VANE_X, 0, 2.0)), (0.16, 0.18, 0.19))
+add_reference("Rudder_Stock_Reference", cylinder(3.0, 72.0, (RUDDER_X, 0, -40.0)), (0.16, 0.18, 0.19))
+add_reference("Mast_Reference", cylinder(6.0, 250.0, (MAST_X, 0, DECK_Z - MAST_DEPTH)),
+              (0.68, 0.49, 0.28))
+for name, level in zip(("Lower", "Upper"), YARD_LEVELS):
+    yard = Part.makeCylinder(2.0, 210.0, Vector(YARD_AXIS_X, -105.0, level), Vector(0, 1, 0))
+    add_reference(f"{name}_Yard_Reference", yard, (0.68, 0.49, 0.28))
+    for index, (lateral, height) in enumerate(clamp_bolt_centers(level), 1):
+        head_x = CLAMP_FRONT_X + CLAMP_HEAD_DEPTH
+        bolt = Part.makeCylinder(0.975, CLAMP_BOLT_LENGTH, Vector(head_x, lateral, height), Vector(1, 0, 0))
+        bolt = bolt.fuse(Part.makeCylinder(1.9, 2.0, Vector(head_x - 2.0, lateral, height), Vector(1, 0, 0)))
+        add_reference(f"{name}_Yard_M2_Bolt_{index}_Reference", bolt, (0.65, 0.69, 0.71))
+        nut = hex_prism(4.0, 1.6, (CLAMP_REAR_X - CLAMP_NUT_DEPTH, lateral, height))
+        nut = nut.cut(Part.makeCylinder(1.0, 1.8, Vector(CLAMP_REAR_X - CLAMP_NUT_DEPTH - 0.1, lateral, height), Vector(1, 0, 0)))
+        add_reference(f"{name}_Yard_M2_Nut_{index}_Reference", nut, (0.65, 0.69, 0.71))
+add_reference("Sail_Reference", Part.makeBox(0.08, 190.0, 170.0, Vector(CLAMP_FRONT_X - 1.0, -95.0, 40.0)),
+              (0.97, 0.86, 0.35))
+neutral_index = math.radians(ARM_INDEX)
+vane_pin = Vector(VANE_X + VANE_RADIUS * math.sin(neutral_index),
+                  -VANE_RADIUS * math.cos(neutral_index), ARM_Z + TAB_THICKNESS / 2)
+rudder_pin = Vector(RUDDER_X - TILLER_RADIUS * math.sin(neutral_index),
+                    TILLER_RADIUS * math.cos(neutral_index), ARM_Z + TAB_THICKNESS / 2)
+link_direction = (rudder_pin - vane_pin).normalize()
+link_length = (rudder_pin - vane_pin).Length
+add_reference("M2_Rod_45mm_Reference", Part.makeCylinder(1.0, 45.0,
+              (rudder_pin + vane_pin) / 2 - 22.5 * link_direction, link_direction), (0.65, 0.69, 0.71))
+for name, pin, direction in (("Vane", vane_pin, link_direction), ("Rudder", rudder_pin, -link_direction)):
+    connector = Part.makeCylinder(4.0, 25.0, pin - 3.0 * direction, direction)
+    connector = connector.cut(Part.makeCylinder(1.1, 26.0, pin - 3.5 * direction, direction))
+    fork_slot = Part.makeBox(12.0, 12.0, 2.4, Vector(-6.0, -6.0, -1.2))
+    fork_slot.Placement = App.Placement(pin, App.Rotation(Vector(1, 0, 0), direction))
+    connector = connector.cut(fork_slot)
+    add_reference(f"{name}_Clevis_Envelope_Reference", connector, (0.65, 0.69, 0.71))
+    add_reference(f"{name}_M2_Pin_Reference", cylinder(1.95, 8.0, (pin.x, pin.y, pin.z - 4.0)),
+                  (0.40, 0.44, 0.46))
+
+doc.recompute()
+App.Console.PrintMessage(f"Lahar v{VERSION}: {len(parts)} printable parts generated.\n")
+if App.GuiUp:
+    import FreeCADGui
+    FreeCADGui.activeDocument().activeView().viewAxonometric()
+    FreeCADGui.activeDocument().activeView().fitAll()

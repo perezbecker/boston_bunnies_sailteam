@@ -8,32 +8,37 @@ it.
 
 | Boat | Current | What it is |
 |---|---|---|
-| [**Lahar**](boats/lahar/) | v1 | Self-steering downwind trimaran. 200 mm, ~106 g, square sail on a dowel mast, mechanical wind vane driving the rudder. No electronics. |
+| [**Lahar**](boats/lahar/) | v2 one-piece prototype | Rounded deck-down body with attached amas, beams and skeg. 220 mm, approximately 318 g all-up, solid vane, four-bolt yard clamps, keyed steering mounts and MK4S files. |
 
-[![Lahar](boats/lahar/renders/hero.png)](boats/lahar/)
+[![Lahar v2](boats/lahar/v2/renders/hero.png)](boats/lahar/v2/)
 
 ## Repository layout
 
 ```
 boats/<name>/
-  README.md          the boat — current design up front, version history at the end
-  cad/               parametric FreeCAD macro: the source of truth
-  docs/              design spec and build guide
-  renders/           reference renders of the current design
-  versions/vN/       frozen superseded iterations, each with its own README
+  README.md          current-version entry point and version history
+  v2/                all assets for the current prototype
+    cad/             parametric macro, FreeCAD/STEP files and generation scripts
+    docs/            design and assembly guide
+    print/           STLs, self-contained 3MFs and printer-specific G-code
+    renders/         CAD-derived reference views
+    reports/         software checks and engineering estimates
+  versions/v1/       frozen previous assets, including their original print jobs
 ```
 
-The current design always sits at the boat root, so `boats/lahar/cad/lahar.FCMacro` is
-always the macro you want. Superseded iterations move down into `versions/` and stay
-readable without competing for attention.
+The boat README points to the current version. Starting with Lahar v2, current
+assets live in an explicit version directory, as requested for this prototype.
+The source is [boats/lahar/v2/cad/lahar.FCMacro](boats/lahar/v2/cad/lahar.FCMacro).
+Superseded assets remain under `versions/`; never rebuild or overwrite the archive.
 
 ## Working on a design
 
 The macro is the single source of truth. Everything else — the dimensions in the spec,
 the figures printed on the renders — is a snapshot derived from it. To change a design,
-edit the `PARAMETERS` block at the top of the macro and regenerate, rather than
+edit the parameter constants at the top of the macro and regenerate, rather than
 hand-editing the derived numbers downstream. Numbers that get hand-patched in one place
 and not another are how a spec and a render end up disagreeing about the same boat.
 
-See [`boats/lahar/versions/README.md`](boats/lahar/versions/README.md) for how to cut a
-new version once a design has been printed and sailed.
+See [boats/lahar/versions/README.md](boats/lahar/versions/README.md) for preservation
+rules. A valid model and completed slice do not prove watertightness or sailing
+performance; each version records its outstanding physical tests.
