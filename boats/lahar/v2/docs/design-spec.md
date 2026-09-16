@@ -4,6 +4,10 @@ Boston Bunnies Sail Team, 2026-09-15. Source of truth:
 [lahar.FCMacro](../cad/lahar.FCMacro). Generated estimates are in
 [engineering.json](../reports/engineering.json).
 
+Printer files were re-sliced for the **CORE One+, stock 0.4 mm high-flow nozzle,
+ordinary 1.75 mm PLA and smooth PEI** on 2026-09-16. The geometry and two-bed
+layout are unchanged; these are single-material jobs without an MMU.
+
 **This is an untested physical prototype.** The design addresses v1's reported
 leaks, rudder interference, clevis mismatch and steering-friction concerns.
 No software check can certify an FDM hull as watertight or establish the friction
@@ -78,7 +82,7 @@ Z is upward. The continuous deck is Z=1.2, retained from the steering layout.
 | Yard clamps | Two sets of three 22 x 22 pieces; four M2 bolts/nuts per set |
 | Clamp groove diameters / split gaps | 6.2 mast, 4.2 yard / 0.4 on each side of middle saddle |
 
-The whole 220 x 199.41 mm body fits the **250 x 210 mm MK4S bed** with its brim.
+The whole 220 x 199.41 mm body fits the **250 x 220 mm CORE One+ bed** with its brim.
 Only the steering parts, clamp pieces and fit coupon print separately. The
 rudder and longer counterweight arm extend beyond the printed body.
 Loft interpolation makes measured dimensions differ slightly from station values.
@@ -101,16 +105,16 @@ Hardware masses, wood density, cloth weight and seal-coat mass are assumptions,
 not measurements. Cloth is budgeted at 30 g/m2. Weigh the actual parts.
 The body alone is 239.77 g by CAD volume; both clamp sets together are 16.49 g.
 The complete solid vane including its spine and counterweight arm is 10.33 g.
-The two print jobs consume 296.85 g, including the coupon, supports and brims.
+The two print jobs consume 296.83 g, including the coupon, supports and brims.
 The coupon now shares the steering bed, but is never part of the boat's displacement.
-Subtracting its 8.57 g CAD material estimate leaves 288.28 g; counting all the
-remaining waste as if it stayed on the boat gives a conservative **328.99 g** case.
-Repacking does not change the nominal assembled mass or center of gravity.
+Subtracting its 8.57 g CAD material estimate leaves 288.26 g; counting all the
+remaining waste as if it stayed on the boat gives a conservative **328.97 g** case.
+The printer change does not change the nominal assembled mass or center of gravity.
 
 | Fresh-water case | Waterline at X=110 | Trim | Minimum deck freeboard | Lowest ama bottom |
 | --- | --- | --- | --- | --- |
 | Nominal 318.32 g | Z=-14.81 | 1.11 deg bow-down | 13.88 mm | 0.74 mm immersed |
-| Conservative 328.99 g | Z=-13.96 | 0.96 deg bow-down | 13.32 mm | 1.59 mm immersed |
+| Conservative 328.97 g | Z=-13.96 | 0.96 deg bow-down | 13.32 mm | 1.58 mm immersed |
 | 350 g loading check | Z=-12.41 | 0.65 deg bow-down | 12.36 mm | 3.12 mm immersed |
 
 These are static calculations on closed exterior meshes generated from the CAD
@@ -458,7 +462,7 @@ used for hydrostatics to the working directory. The one-piece body, 46 closed
 cells, deck-down orientation, skin thickness and steering travel are checked
 before export, along with the solid vane web, clamp hardware fit, blind-guide
 backing and rejection of reversed/swapped mounts. The two projects must round-trip and remain inside the actual
-250 x 210 x 220 mm MK4S volume. No physical print or leak test has been performed.
+250 x 220 x 270 mm CORE One+ volume. No physical print or leak test has been performed.
 
 Rebuilds overwrite only generated assets inside this v2 directory. Never run a
 rebuild inside the frozen v1 archive. Preserve physical test observations before

@@ -1,4 +1,4 @@
-"""Slice Lahar v2 with official MK4S presets and verify the resulting projects and toolpaths."""
+"""Slice Lahar v2 with official CORE One+ presets and verify projects and toolpaths."""
 
 import argparse
 import configparser
@@ -12,9 +12,9 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 
 PRESETS = {
-    "print": "0.15mm STRUCTURAL @MK4S 0.4",
-    "filament": "Generic PLA @MK4S HF0.4",
-    "printer": "Original Prusa MK4S HF0.4 nozzle",
+    "print": "0.15mm STRUCTURAL @COREONE 0.4",
+    "filament": "Generic PLA @COREONE HF0.4",
+    "printer": "Prusa CORE One HF0.4 nozzle",
 }
 JOBS = ("Steering", "Body")
 NUMBER = re.compile(r"([XYZEF])([-+]?(?:\d*\.\d+|\d+\.?\d*))")
@@ -71,16 +71,19 @@ def resolved_configuration(text):
 def validate_gcode(path, job):
     text = path.read_text(encoding="utf-8")
     config_text, config = resolved_configuration(text)
-    required = {"printer_model": "MK4S", "bed_shape": "0x0,250x0,250x210,0x210",
-                "nozzle_diameter": "0.4", "filament_type": "PLA",
+    required = {"printer_model": "COREONE", "bed_shape": "0x0,250x0,250x220,0x220",
+                "max_print_height": "270", "nozzle_diameter": "0.4", "nozzle_high_flow": "1",
+                "filament_type": "PLA", "filament_diameter": "1.75", "single_extruder_multi_material": "0",
+                "first_layer_temperature": "230", "temperature": "225", "bed_temperature": "60",
+                "chamber_temperature": "20", "chamber_minimal_temperature": "0",
                 "layer_height": "0.15", "perimeters": "4", "fill_density": "100%",
                 "top_solid_layers": "12" if job == "Body" else "8",
                 "bottom_solid_layers": "12", "arc_fitting": "disabled"}
     for key, value in required.items():
         if config.get(key) != value:
             raise ValueError(f"{path.name}: {key}={config.get(key)!r}, expected {value!r}")
-    if not re.search(r'M862\.3 P\s*"MK4S"', text) or "M862.1" not in text:
-        raise ValueError("Missing MK4S printer/nozzle compatibility checks")
+    if not re.search(r'^M862\.3 P\s*"COREONE"', text, re.MULTILINE) or not re.search(r'^M862\.1 P0\.4\b', text, re.MULTILINE):
+        raise ValueError("Missing CORE One+ printer/nozzle compatibility checks")
     positions = dict.fromkeys("XYZE", 0.0)
     relative_extrusion = False
     relative_position = False
@@ -122,9 +125,9 @@ def validate_gcode(path, job):
             positions["E"] = previous["E"] + extrusion
             if printing and extrusion > 0 and ("X" in values or "Y" in values):
                 for point in (previous, positions):
-                    for key, limit in zip("XYZ", (250, 210, 220)):
+                    for key, limit in zip("XYZ", (250, 220, 270)):
                         if not -0.01 <= point[key] <= limit + 0.01:
-                            raise ValueError(f"Extrusion outside MK4S build volume: {command}")
+                            raise ValueError(f"Extrusion outside CORE One+ build volume: {command}")
                         minima[key] = min(minima[key], point[key])
                         maxima[key] = max(maxima[key], point[key])
                 count += 1
@@ -144,8 +147,11 @@ def validate_gcode(path, job):
         "extrusion_min_mm": minima, "extrusion_max_mm": maxima,
         "toolpath_sha256": digest.hexdigest(), "gcode_sha256": hashlib.sha256(text.encode()).hexdigest(),
         "printer_preset": config["printer_settings_id"],
+        "printer_model": config["printer_model"], "build_volume_mm": [250, 220, 270],
+        "high_flow_nozzle": config["nozzle_high_flow"] == "1",
         "nozzle_temperature_c": config["temperature"], "first_layer_temperature_c": config["first_layer_temperature"],
         "bed_temperature_c": config["bed_temperature"],
+        "chamber_temperature_c": config["chamber_temperature"],
     }
 
 
@@ -183,13 +189,14 @@ def main():
         directory.mkdir(parents=True, exist_ok=True)
     report_path = reports / "print-validation.json"
     report = json.loads(report_path.read_text()) if report_path.exists() else {}
-    report = {job: result for job, result in report.items() if job in JOBS}
+    report = {job: result for job, result in report.items()
+              if job in JOBS and result.get("printer_preset") == PRESETS["printer"]}
     for job in args.jobs:
         settings = dict(config, support_material="1" if job == "Steering" else "0",
                         top_solid_layers="12" if job == "Body" else "8")
         if job == "Body":
             settings.update(perimeter_generator="classic", thin_walls="1", bridge_angle="180")
-        stem = f"Lahar_v2_{job}_MK4S_PLA_04"
+        stem = f"Lahar_v2_{job}_COREONEplus_PLA_04"
         project = projects / f"{stem}.3mf"
         gcode = usb / f"{stem}.gcode"
         with tempfile.TemporaryDirectory(dir=args.amf_dir) as temporary:

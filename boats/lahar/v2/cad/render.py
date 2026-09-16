@@ -109,7 +109,7 @@ def main(amf_dir):
     clearance = cad["rudder_full_sweep_clearance_mm"]
 
     beam = cad["parts"]["Trimaran_Body"]["print_bounds_mm"][1]
-    canvas = figure("LAHAR V2 / ONE PIECE", f"220 mm main hull  |  {beam:.1f} mm overall hull beam  |  {mass:.0f} g estimated all-up  |  MK4S prototype")
+    canvas = figure("LAHAR V2 / ONE PIECE", f"220 mm main hull  |  {beam:.1f} mm overall hull beam  |  {mass:.0f} g estimated all-up  |  CORE One+ prototype")
     draw_3d(canvas, (0.02, 0.075, 0.96, 0.79), objects, 23, -53)
     save(canvas, destination / "hero.png",
             "Actual CAD geometry. Yellow: sail. Coral: solid printed vane. Silver: hardware. Colors are illustrative; prints are single-material.")
@@ -215,7 +215,7 @@ def main(amf_dir):
     save(canvas, destination / "hull-section.png",
          "Body prints upside down. Four perimeters and 12 top/bottom layers; no removable internal supports. Physical leak test still required.")
 
-    canvas = figure("MK4S / TWO PRINT JOBS", "250 x 210 mm beds. All 16 parts included. Print the small-parts bed first; the body stays deck-down.", (16, 8))
+    canvas = figure("CORE ONE+ / TWO PRINT JOBS", "250 x 220 mm beds. All 16 parts included. Print the small-parts bed first; the body stays deck-down.", (16, 8))
     for index, job in enumerate(("Steering", "Body")):
         xml = ET.parse(amf_dir / f"Lahar_v2_{job}.amf").getroot()
         job_objects = []
@@ -228,11 +228,11 @@ def main(amf_dir):
             job_objects.append({"name": name, "vertices": points, "triangles": faces,
                                 "color": by_name.get(name, {"color": [0.6, 0.64, 0.65]})["color"]})
         axes = draw_3d(canvas, (0.02 + index * 0.49, 0.16, 0.46, 0.66), job_objects, 65, -73)
-        axes.plot([0, 250, 250, 0, 0], [0, 0, 210, 210, 0], [-0.2] * 5, color="#a4b4b4", linewidth=1)
+        axes.plot([0, 250, 250, 0, 0], [0, 0, 220, 220, 0], [-0.2] * 5, color="#a4b4b4", linewidth=1)
         axes.set_xlim(-5, 255)
-        axes.set_ylim(-5, 215)
+        axes.set_ylim(-5, 225)
         axes.set_zlim(0, 70)
-        axes.set_box_aspect((260, 220, 70))
+        axes.set_box_aspect((260, 230, 70))
         label = "STEERING + CLAMPS + COUPON" if job == "Steering" else "ONE-PIECE BODY"
         axes.set_title(f"{label}  |  {prints[job]['estimated_time']}  |  {prints[job]['filament_including_waste_g']:.2f} g", fontsize=11, color=INK, pad=0)
     save(canvas, destination / "print-layouts.png",

@@ -1,7 +1,8 @@
 # Lahar v2
 
-Downwind trimaran prototype for the **Prusa MK4S, stock 0.4 mm high-flow nozzle,
-ordinary PLA, smooth PEI, no MMU**. Prepared 2026-09-15.
+Downwind trimaran prototype for the **Prusa CORE One+, stock 0.4 mm high-flow nozzle,
+ordinary 1.75 mm PLA, smooth PEI, no MMU**. Design prepared 2026-09-15;
+printer files updated 2026-09-16. The two layouts and boat geometry are unchanged.
 
 **One-piece revision:** the enclosed main hull, both amas, beams and skeg print
 together, upside down, with a continuous rounded exterior. There are no separate
@@ -21,7 +22,7 @@ printing the body. The clevis's internal fork gap is still unknown.
 
 ## Start here
 
-- [Printing instructions](instructions.md): two USB jobs, fit checks, and MK4S setup.
+- [Printing instructions](instructions.md): two USB jobs, fit checks, and CORE One+ setup.
 - [Design and assembly guide](docs/design-spec.md): sealing, linkage, weight budget, and test procedure.
 - [Clamp and steering-mount details](renders/assembly-details.png): exploded assembly views.
 - [Native FreeCAD assembly](cad/Lahar_v2.FCStd) and [STEP assembly](cad/Lahar_v2.step).
@@ -63,18 +64,19 @@ deck is almost awash. Use sheltered water and verify the physical boat before sa
 
 | Job | Time estimate | PLA including waste |
 | --- | --- | --- |
-| Steering, both clamp sets and fit coupon, 15 parts | 6 h 5 min | 58.03 g |
-| One-piece body with locating recesses | 26 h 3 min | 238.82 g |
+| Steering, both clamp sets and fit coupon, 15 parts | 5 h 52 min | 58.02 g |
+| One-piece body with locating recesses | 25 h 30 min | 238.81 g |
 
-Total: **32 h 8 min and 296.85 g**, including the coupon and removable waste.
-All 16 parts are included exactly once; only their placement and job grouping
-changed. The body stays on its own bed. Have 350 g of PLA available.
+Total: **31 h 22 min 44 s and 296.83 g**, including the coupon and removable waste.
+All 16 parts are included exactly once, in the same two layouts. The body stays
+on its own bed. Have 350 g of PLA available.
 Colors in the renders distinguish materials; all G-code jobs are single-material.
 
-**The slicing is not identical to v1.** Deck-down printing and 0.15 mm layers are retained,
-but the MK4S-specific printer preset, shell construction, perimeter count, solid
-layers, and support layout are different. Never run the archived CORE One+ G-code
-on the MK4S. The MK4S print volume is **250 x 210 x 220 mm**.
+**The slicing is not identical to v1.** Although both now target the CORE One+
+and retain deck-down printing and 0.15 mm layers, v2 has different shell geometry,
+perimeter counts, solid layers and supports. Use the current v2 files, not the
+archived v1 jobs or superseded MK4S jobs. The current CORE One+ print volume is
+**250 x 220 x 270 mm**; its official profile is named `Prusa CORE One HF0.4 nozzle`.
 
 ## More views and evidence
 

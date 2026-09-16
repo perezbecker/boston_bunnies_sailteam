@@ -279,10 +279,10 @@
       2.569042598336785
     ],
     "printed_cad_mass_g": 277.6135542770845,
-    "boat_jobs_filament_with_waste_g": 288.2772375028714,
-    "all_jobs_filament_with_waste_g": 296.85,
+    "boat_jobs_filament_with_waste_g": 288.25723750287136,
+    "all_jobs_filament_with_waste_g": 296.83,
     "coupon_cad_mass_excluded_g": 8.572762497128645,
-    "conservative_all_up_g": 328.98694023255825,
+    "conservative_all_up_g": 328.9669402325582,
     "note": "The coupon's CAD mass is excluded even though it shares the steering job. The conservative case counts all remaining supports/brims as boat mass. Hardware and adhesive masses are assumptions."
   },
   "upright_cases": [
@@ -303,19 +303,19 @@
       "solver_evaluations": 5
     },
     {
-      "mass_g": 328.98694023255825,
+      "mass_g": 328.9669402325582,
       "heel_deg": 0.0,
-      "waterline_at_x110_mm": -13.959085955980685,
-      "trim_stern_down_deg": -0.9603065681510048,
-      "minimum_deck_freeboard_mm": 13.315347469534688,
-      "ama_bottom_clearance_mm": -1.58515998669262,
-      "longitudinal_balance_error_mm": 2.3021584638627246e-11,
-      "displacement_error_g": 8.081428859441075e-10,
+      "waterline_at_x110_mm": -13.960639198680754,
+      "trim_stern_down_deg": -0.9605997042551989,
+      "minimum_deck_freeboard_mm": 13.316337907473711,
+      "ama_bottom_clearance_mm": -1.583627334181454,
+      "longitudinal_balance_error_mm": 2.1501023184100632e-11,
+      "displacement_error_g": 7.993321560206823e-10,
       "solver_tolerance_g_mm": [
         0.05,
         0.05
       ],
-      "restoring_moment_Nmm": 0.9232041092594361,
+      "restoring_moment_Nmm": 0.9231479360780316,
       "solver_evaluations": 5
     },
     {
@@ -337,67 +337,67 @@
   ],
   "heel_cases": [
     {
-      "mass_g": 328.98694023255825,
+      "mass_g": 328.9669402325582,
       "heel_deg": -10,
-      "waterline_at_x110_mm": -16.552637206377497,
-      "trim_stern_down_deg": -0.43959258044422117,
-      "minimum_deck_freeboard_mm": 0.3739802263933534,
-      "ama_bottom_clearance_mm": -13.39871796016017,
-      "longitudinal_balance_error_mm": 2.5011104298755527e-12,
-      "displacement_error_g": 6.480149750132114e-12,
+      "waterline_at_x110_mm": -16.553940912932973,
+      "trim_stern_down_deg": -0.43980539808111463,
+      "minimum_deck_freeboard_mm": 0.3752354716252242,
+      "ama_bottom_clearance_mm": -13.397418041567875,
+      "longitudinal_balance_error_mm": 2.4584778657299466e-12,
+      "displacement_error_g": 6.536993168992922e-12,
       "solver_tolerance_g_mm": [
         0.05,
         0.05
       ],
-      "restoring_moment_Nmm": -13.010687722013577,
+      "restoring_moment_Nmm": -13.00689417333108,
       "solver_evaluations": 5
     },
     {
-      "mass_g": 328.98694023255825,
+      "mass_g": 328.9669402325582,
       "heel_deg": -5,
-      "waterline_at_x110_mm": -14.915325849131476,
-      "trim_stern_down_deg": -0.7175830879273939,
-      "minimum_deck_freeboard_mm": 7.1686857505642845,
-      "ama_bottom_clearance_mm": -7.84972563296691,
-      "longitudinal_balance_error_mm": 5.130118552187923e-12,
+      "waterline_at_x110_mm": -14.916723111518658,
+      "trim_stern_down_deg": -0.7178473228075903,
+      "minimum_deck_freeboard_mm": 7.169888507684602,
+      "ama_bottom_clearance_mm": -7.84834623191122,
+      "longitudinal_balance_error_mm": 5.059064278611913e-12,
       "displacement_error_g": -1.1050360626541078e-10,
       "solver_tolerance_g_mm": [
         0.05,
         0.05
       ],
-      "restoring_moment_Nmm": -3.0052724554577277,
+      "restoring_moment_Nmm": -3.002261266251987,
       "solver_evaluations": 5
     },
     {
-      "mass_g": 328.98694023255825,
+      "mass_g": 328.9669402325582,
       "heel_deg": 5,
-      "waterline_at_x110_mm": -14.915322329058283,
-      "trim_stern_down_deg": -0.7182486741283961,
-      "minimum_deck_freeboard_mm": 7.168192287837557,
-      "ama_bottom_clearance_mm": -7.852561480461754,
-      "longitudinal_balance_error_mm": 4.192202140984591e-12,
-      "displacement_error_g": -1.0976464182022028e-10,
+      "waterline_at_x110_mm": -14.916719581951686,
+      "trim_stern_down_deg": -0.7185131375193303,
+      "minimum_deck_freeboard_mm": 7.169394867671097,
+      "ama_bottom_clearance_mm": -7.851174093078129,
+      "longitudinal_balance_error_mm": 4.121147867408581e-12,
+      "displacement_error_g": -1.0965095498249866e-10,
       "solver_tolerance_g_mm": [
         0.05,
         0.05
       ],
-      "restoring_moment_Nmm": 4.844831261523841,
+      "restoring_moment_Nmm": 4.8417082275264685,
       "solver_evaluations": 5
     },
     {
-      "mass_g": 328.98694023255825,
+      "mass_g": 328.9669402325582,
       "heel_deg": 10,
-      "waterline_at_x110_mm": -16.552651699401462,
-      "trim_stern_down_deg": -0.4403358543452807,
-      "minimum_deck_freeboard_mm": 0.37382546732522925,
-      "ama_bottom_clearance_mm": -13.398716694946785,
-      "longitudinal_balance_error_mm": 2.4158453015843406e-12,
-      "displacement_error_g": 6.480149750132114e-12,
+      "waterline_at_x110_mm": -16.553955405529234,
+      "trim_stern_down_deg": -0.44054899461325664,
+      "minimum_deck_freeboard_mm": 0.375080639443059,
+      "ama_bottom_clearance_mm": -13.39741678107903,
+      "longitudinal_balance_error_mm": 2.5011104298755527e-12,
+      "displacement_error_g": 6.252776074688882e-12,
       "solver_tolerance_g_mm": [
         0.05,
         0.05
       ],
-      "restoring_moment_Nmm": 14.828866080110727,
+      "restoring_moment_Nmm": 14.82496211452789,
       "solver_evaluations": 5
     }
   ],

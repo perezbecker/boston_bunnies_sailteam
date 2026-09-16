@@ -1,8 +1,10 @@
-# Printing Lahar v2 on the Prusa MK4S
+# Printing Lahar v2 on the Prusa CORE One+
 
-These files are for the setup confirmed on 2026-09-15: **Original Prusa MK4S,
+These files were re-sliced for the setup requested on 2026-09-16: **Prusa CORE One+,
 stock 0.4 mm high-flow nozzle, ordinary 1.75 mm PLA, smooth PEI, no MMU**.
 Other nozzles, materials, printer models, or an MMU require re-slicing.
+These replace the previous v2 MK4S printer files. Do not run those old files on
+the CORE One+, and do not bypass a printer or nozzle compatibility warning.
 
 **Prototype status:** CAD, meshes, slicing, and project re-slicing have been
 checked. The actual print, hardware fit, seal, and sailing behavior have not.
@@ -15,7 +17,8 @@ bottoms upward. The amas, crossbeams and skeg are part of that same print.
 The latest body has recessed steering-mount keys; its matching stands have feet.
 All 16 parts now fit in **two jobs**. The steering job includes the solid vane,
 both four-bolt yard-clamp sets and the fit coupon. Only placement and job grouping
-changed; no part was resized or omitted. The standalone coupon job is no longer needed.
+were changed to make two jobs; this printer update retains those layouts and
+all geometry unchanged. The standalone coupon job is no longer needed.
 Do not mix the updated keyed stands with an earlier unkeyed v2 body.
 
 ## USB files
@@ -25,15 +28,15 @@ Print each job once, clearing the sheet between jobs:
 
 | File | Contents | Normal-mode estimate | PLA including waste |
 | --- | --- | --- | --- |
-| [Lahar_v2_Steering_MK4S_PLA_04.gcode](print/usb/Lahar_v2_Steering_MK4S_PLA_04.gcode) | Fifteen parts: eight steering parts, six clamp pieces and the fit coupon | 6 h 4 min 48 s | 58.03 g |
-| [Lahar_v2_Body_MK4S_PLA_04.gcode](print/usb/Lahar_v2_Body_MK4S_PLA_04.gcode) | Enclosed main hull, two amas, beams, skeg and steering-mount recesses, all deck-down | 26 h 3 min 12 s | 238.82 g |
+| [Lahar_v2_Steering_COREONEplus_PLA_04.gcode](print/usb/Lahar_v2_Steering_COREONEplus_PLA_04.gcode) | Fifteen parts: eight steering parts, six clamp pieces and the fit coupon | 5 h 52 min 22 s | 58.02 g |
+| [Lahar_v2_Body_COREONEplus_PLA_04.gcode](print/usb/Lahar_v2_Body_COREONEplus_PLA_04.gcode) | Enclosed main hull, two amas, beams, skeg and steering-mount recesses, all deck-down | 25 h 30 min 22 s | 238.81 g |
 
-Total: **32 h 8 min, 296.85 g**, including the coupon, supports and brims.
+Total: **31 h 22 min 44 s, 296.83 g**, including the coupon, supports and brims.
 Have at least 350 g available to allow for loading and a repeat fit test.
 These are ordinary text G-code files, not binary BGCODE. They have no thumbnail.
 
 Use a working FAT32 USB drive. Copy the two linked G-code files to it, safely
-eject, and insert it into the MK4S. Do not rename an STL or 3MF to G-code.
+eject, and insert it into the CORE One+. Do not rename an STL or 3MF to G-code.
 Do not reformat a working drive; formatting erases its contents.
 
 ## Fit check before the body
@@ -76,7 +79,7 @@ gaps for tightening around nominal 6 and 4 mm dowels.
 
 ## Prepare and print
 
-1. Complete the MK4S self-test and calibration, and confirm a normal Prusa test
+1. Complete the CORE One+ self-test and calibration, and confirm a normal Prusa test
    print works. Use current stable firmware from Prusa. Check that the physical
    nozzle is the stock 0.4 mm high-flow type.
 2. With the machine cool, remove old prints and debris. Clean the smooth PEI
@@ -85,6 +88,9 @@ gaps for tightening around nominal 6 and 4 mm dowels.
 3. Load ordinary PLA through the printer's filament-loading menu. These jobs use
    **230 C first layer, 225 C subsequent layers, and a 60 C bed**. Check the
    filament manufacturer's range; unsuitable PLA needs its own profile.
+   The 20 C chamber setting controls ventilation, not a hot-chamber preheat;
+   the minimum chamber temperature is 0 C. Close the door before printing and
+   leave the CORE One+'s automatic top ventilation grille unobstructed.
 4. Select the appropriate file in **Print**. Keep all printer, nozzle and
    firmware compatibility checks enabled. Never dismiss a mismatch warning.
 5. Let the printer finish its normal preheat, homing, nozzle cleaning, mesh
@@ -94,7 +100,7 @@ gaps for tightening around nominal 6 and 4 mm dowels.
    machine to cool before reaching in or removing the sheet.
 7. Check long jobs periodically. The body prints **deck-down, rounded bottoms
    upward**, like v1. Its 220 x 199.4 mm footprint, including the attached amas,
-   fits the MK4S's 250 x 210 mm bed with the supplied brim. No removable support
+   fits the CORE One+'s 250 x 220 mm bed with the supplied brim. No removable support
    belongs inside the hulls; the modeled ribs and sloped roofs remain in the boat.
 8. Let each completed job cool. Flex the sheet gently. Remove steering supports
    carefully, especially beneath the solid vane, mounting feet, clamp grooves,
@@ -112,15 +118,16 @@ bolts and nuts are not printed. The [mount guide](docs/design-spec.md#steering-m
 shows where each stand belongs; dry-fit its feet in the shallow recesses and
 then glue its base to the deck. Do not drill or deepen those recesses.
 
-The MK4S is a bed-slinger, not a CORE One+ with chamber ventilation. Leave room
-for bed motion. If it is inside a separate enclosure, follow Prusa's PLA
-ventilation guidance; do not apply CORE One+ door/grille instructions to it.
+The CORE One+ manages the PLA chamber fans and opens its top ventilation grille
+automatically. Do not obstruct or force the grille during movement. This differs
+from the original CORE One's manual vent. Keep the door closed during printing
+and wait for the printer to stop and cool before reaching inside.
 
 ## What is and is not the same as v1
 
 | Setting | v1 | v2 |
 | --- | --- | --- |
-| Printer | CORE One / One+ HF0.4 | Original Prusa MK4S HF0.4 |
+| Printer | CORE One / One+ HF0.4 | CORE One / One+ HF0.4 |
 | Body construction / orientation | Integrated closed body, deck-down | Integrated closed body, deck-down |
 | Layers / first layer | 0.15 / 0.20 mm | 0.15 / 0.20 mm |
 | Perimeters | 2 | 4, 0.45 mm requested width |
@@ -132,10 +139,13 @@ ventilation guidance; do not apply CORE One+ door/grille instructions to it.
 | Brim setting | 3 mm | 3 mm; actual brim extent depends on first-layer footprint |
 | Perimeter / external speed | 60 / 40 mm/s | 40 / 25 mm/s |
 
-The official presets are `0.15mm STRUCTURAL @MK4S 0.4`,
-`Generic PLA @MK4S HF0.4`, and `Original Prusa MK4S HF0.4 nozzle`, from
+The official presets are `0.15mm STRUCTURAL @COREONE 0.4`,
+`Generic PLA @COREONE HF0.4`, and `Prusa CORE One HF0.4 nozzle`, from
 PrusaSlicer 2.9.6. Startup and shutdown commands come from that printer preset,
-not from the old CORE One+ files. Every project has a full resolved configuration.
+including chamber controls and compatibility checks; the old MK4S G-code was
+not renamed or hand-edited. The bundled `COREONE` model explicitly covers
+**CORE One and CORE One+**, so that model name in G-code is expected. Do not
+select CORE One L. Every project has a full resolved configuration.
 The body uses the classic perimeter generator with thin-wall detection and
 180-degree bridge direction. These settings were checked on the actual ribs
 and final roof closures; changing them requires another preview and test.
@@ -144,8 +154,8 @@ and final roof closures; changing them requires another preview and test.
 
 Open these **as projects**, not as imported geometry:
 
-- [Steering, clamps and coupon project](print/projects/Lahar_v2_Steering_MK4S_PLA_04.3mf)
-- [Body project](print/projects/Lahar_v2_Body_MK4S_PLA_04.3mf)
+- [Steering, clamps and coupon project](print/projects/Lahar_v2_Steering_COREONEplus_PLA_04.3mf)
+- [Body project](print/projects/Lahar_v2_Body_COREONEplus_PLA_04.3mf)
 
 Use Preview to inspect the continuous first-layer deck and beams, rounded outer
 walls, internal ribs and sloped closures, blind mast well and guide recesses,
@@ -162,7 +172,7 @@ and manifold; printable CAD parts are valid single solids. The saved FreeCAD
 document was reopened successfully. The body has one connected exterior and
 46 closed internal cells. Both supplied slices completed without warnings;
 the combined steering job has 14,716 actual support extrusion moves. Model extrusion paths fit
-the MK4S's 250 x 210 x 220 mm volume. Each self-contained 3MF was re-sliced alone
+the CORE One+'s 250 x 220 x 270 mm volume. Each self-contained 3MF was re-sliced alone
 and reproduced identical extrusion toolpaths and resolved settings.
 All 16 parts appear exactly once across the two projects. The coupon remains
 excluded from the assembled boat's weight even though it now shares a print job.
@@ -176,7 +186,7 @@ prototype's [acceptance tests](docs/design-spec.md#acceptance-tests).
 
 ## References
 
-- [Official MK4S support, firmware, handbook and slicer](https://help.prusa3d.com/product/mk4s)
+- [Official CORE One+ support, firmware, handbook and slicer](https://help.prusa3d.com/product/core-one-plus)
 - [Prusa USB guidance](https://help.prusa3d.com/article/sd-cards-and-usb-drives_112291)
 - [Prusa PLA guidance](https://help.prusa3d.com/article/pla_2062)
 - [Prusa watertight-printing discussion](https://blog.prusa3d.com/watertight-3d-printing-part-2_53638/)

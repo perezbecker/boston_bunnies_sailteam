@@ -73,8 +73,8 @@ def verify_layout(objects):
         bounds = mesh.BoundBox
         rectangle = (position[0] - 3.0, position[1] - 3.0,
                      position[0] + bounds.XLength + 3.0, position[1] + bounds.YLength + 3.0)
-        if rectangle[0] < 0 or rectangle[1] < 0 or rectangle[2] > 250 or rectangle[3] > 210:
-            raise ValueError(f"{name}: outside MK4S bed including brim: {rectangle}")
+        if rectangle[0] < 0 or rectangle[1] < 0 or rectangle[2] > 250 or rectangle[3] > 220:
+            raise ValueError(f"{name}: outside CORE One+ bed including brim: {rectangle}")
         for other_name, other in rectangles:
             if min(rectangle[2], other[2]) > max(rectangle[0], other[0]) and \
                     min(rectangle[3], other[3]) > max(rectangle[1], other[1]):
