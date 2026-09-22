@@ -79,6 +79,11 @@ def validate_gcode(path, job):
                 "layer_height": "0.15", "perimeters": "4", "fill_density": "100%",
                 "top_solid_layers": "12" if job == "Body" else "8",
                 "bottom_solid_layers": "12", "arc_fitting": "disabled"}
+    if job == "Steering":
+        required.update(brim_width="5", brim_separation="0", first_layer_speed="15",
+                        first_layer_infill_speed="15",
+                        first_layer_acceleration="300", perimeter_acceleration="600",
+                        external_perimeter_acceleration="400", travel_acceleration="1500")
     for key, value in required.items():
         if config.get(key) != value:
             raise ValueError(f"{path.name}: {key}={config.get(key)!r}, expected {value!r}")
@@ -88,6 +93,9 @@ def validate_gcode(path, job):
     relative_extrusion = False
     relative_position = False
     printing = False
+    layer_index = 0
+    feed_rate = 0.0
+    first_layer_max_speed = 0.0
     path_type = ""
     count = 0
     support_count = 0
@@ -97,6 +105,7 @@ def validate_gcode(path, job):
     for raw in text.splitlines():
         if raw == ";LAYER_CHANGE":
             printing = True
+            layer_index += 1
         if raw.startswith(";TYPE:"):
             path_type = raw[6:]
         command = raw.partition(";")[0].strip()
@@ -118,12 +127,15 @@ def validate_gcode(path, job):
             raise ValueError("Arc found despite disabled arc fitting")
         elif opcode in ("G0", "G1"):
             previous = positions.copy()
+            feed_rate = values.get("F", feed_rate)
             for key in "XYZ":
                 if key in values:
                     positions[key] = values[key] + (previous[key] if relative_position else 0)
             extrusion = values.get("E", 0) if relative_extrusion else values.get("E", previous["E"]) - previous["E"]
             positions["E"] = previous["E"] + extrusion
             if printing and extrusion > 0 and ("X" in values or "Y" in values):
+                if layer_index == 1:
+                    first_layer_max_speed = max(first_layer_max_speed, feed_rate / 60)
                 for point in (previous, positions):
                     for key, limit in zip("XYZ", (250, 220, 270)):
                         if not -0.01 <= point[key] <= limit + 0.01:
@@ -137,6 +149,8 @@ def validate_gcode(path, job):
         raise ValueError("Missing or empty printed toolpaths")
     if (job == "Steering") != (support_count > 0):
         raise ValueError(f"Unexpected support paths for {job}: {support_count}")
+    if job == "Steering" and first_layer_max_speed > 15.001:
+        raise ValueError(f"Steering first-layer extrusion exceeds 15 mm/s: {first_layer_max_speed}")
     mass = re.search(r"^; filament used \[g\] = ([\d.]+)", text, re.MULTILINE)
     time = re.search(r"^; estimated printing time \(normal mode\) = (.+)$", text, re.MULTILINE)
     if mass is None or time is None:
@@ -152,6 +166,10 @@ def validate_gcode(path, job):
         "nozzle_temperature_c": config["temperature"], "first_layer_temperature_c": config["first_layer_temperature"],
         "bed_temperature_c": config["bed_temperature"],
         "chamber_temperature_c": config["chamber_temperature"],
+        "brim_width_mm": float(config["brim_width"]),
+        "first_layer_speed_mm_s": float(config["first_layer_speed"]),
+        "first_layer_max_extrusion_speed_mm_s": first_layer_max_speed,
+        "first_layer_acceleration_mm_s2": float(config["first_layer_acceleration"]),
     }
 
 
@@ -196,6 +214,13 @@ def main():
                         top_solid_layers="12" if job == "Body" else "8")
         if job == "Body":
             settings.update(perimeter_generator="classic", thin_walls="1", bridge_angle="180")
+        else:
+            settings.update(brim_width="5", brim_separation="0", first_layer_speed="15",
+                            first_layer_infill_speed="15",
+                            first_layer_acceleration="300", perimeter_speed="30", external_perimeter_speed="20",
+                            solid_infill_speed="40", default_acceleration="1000", perimeter_acceleration="600",
+                            external_perimeter_acceleration="400", infill_acceleration="1000",
+                            solid_infill_acceleration="800", travel_acceleration="1500", travel_speed="150")
         stem = f"Lahar_v2_{job}_COREONEplus_PLA_04"
         project = projects / f"{stem}.3mf"
         gcode = usb / f"{stem}.gcode"

@@ -153,7 +153,40 @@ def main(amf_dir):
     canvas.text(0.61, 0.20, "64 mm pin spacing; the 45 mm rod overlaps both clevises.\nMetal clevises are dimension envelopes, not manufacturing models.\nFork gap and actual travel require a physical fit check.",
                 fontsize=10, color=INK, linespacing=1.6)
     save(canvas, destination / "steering-gear.png",
-         "Hull omitted. Solid vane: 64 x 96 x 1 mm with stiffened rim. Balance the complete mechanism using the longer counterweight slot.")
+            "Hull omitted. Flat-backed solid vane and solid counterweight bar, no slot. Lash the weight to the bar and rebalance before sailing.")
+
+    printed_vane = dict(by_name["Vane_Frame"])
+    vertices = np.asarray(printed_vane["vertices"], dtype=float)[:, [0, 2, 1]] * [1, -1, 1]
+    vertices -= vertices.min(axis=0)
+    printed_vane["vertices"] = vertices
+    canvas = figure("VANE / DIRECT BED CONTACT", "September 22 revision. Flat blade and solid counterweight bar, no slot. The stock socket keeps its original axis.", (16, 9))
+    vane_axes = draw_3d(canvas, (0.015, 0.24, 0.49, 0.56), [printed_vane], 24, -63)
+    vane_axes.set_title("Print orientation / flat back on smooth PEI", fontsize=12, color=INK, pad=10)
+    section_axes = canvas.add_axes((0.55, 0.28, 0.40, 0.48), facecolor=BACKGROUND)
+    vane_mesh = trimesh.Trimesh(vertices=vertices, faces=printed_vane["triangles"], process=False)
+    first_section = vane_mesh.section(plane_origin=[0, 0, 0.1], plane_normal=[0, 0, 1])
+    if first_section is None:
+        raise ValueError("The revised vane has no direct first-layer cross-section")
+    first_loops = sorted(first_section.discrete,
+                         key=lambda loop: abs(np.dot(loop[:, 0], np.roll(loop[:, 1], 1)) -
+                                              np.dot(loop[:, 1], np.roll(loop[:, 0], 1))), reverse=True)
+    for index, loop in enumerate(first_loops):
+        section_axes.fill(loop[:, 0], loop[:, 1], color="#df5140" if index == 0 else BACKGROUND,
+                           edgecolor="#aa3f34", linewidth=0.7)
+    section_axes.set_xlim(-6, 180)
+    section_axes.set_ylim(-6, 105)
+    section_axes.set_aspect("equal")
+    section_axes.set_title("CAD cross-section through the first 0.2 mm layer", fontsize=11, color=INK, pad=12)
+    section_axes.set_xlabel("Print X (mm)", color=INK)
+    section_axes.set_ylabel("Print Y (mm)", color=INK)
+    section_axes.spines[["top", "right"]].set_visible(False)
+    adhesion = engineering["steering_print_adhesion"]
+    canvas.text(0.055, 0.16, f"Direct CAD model contact: {cad['vane_first_layer_contact_area_mm2']:.0f} mm2.\nThe blade prints as solid plastic directly on the sheet, not on supports.",
+                fontsize=11, color=INK, linespacing=1.6)
+    canvas.text(0.555, 0.16, f"Steering brim: {adhesion['brim_mm']:.0f} mm, attached.\nActual first-layer extrusion: no more than {adhesion['maximum_first_layer_speed_mm_s']:.0f} mm/s.",
+                fontsize=11, color=INK, linespacing=1.6)
+    save(canvas, destination / "vane-print-contact.png",
+         "The existing hull and mounting interfaces are unchanged. Bed preparation still matters; the revised vane has not yet been test-printed.")
 
     canvas = figure("ASSEMBLY / LOCATING DETAILS", "Two four-bolt yard clamps and two distinct, backed steering-mount recesses. Views show actual CAD, exploded for assembly.", (17, 10))
     clamp_objects = [obj for obj in objects if obj["name"].startswith("Lower_Yard_") and obj["name"] != "Lower_Yard_Reference"]
@@ -215,7 +248,7 @@ def main(amf_dir):
     save(canvas, destination / "hull-section.png",
          "Body prints upside down. Four perimeters and 12 top/bottom layers; no removable internal supports. Physical leak test still required.")
 
-    canvas = figure("CORE ONE+ / TWO PRINT JOBS", "250 x 220 mm beds. All 16 parts included. Print the small-parts bed first; the body stays deck-down.", (16, 8))
+    canvas = figure("CORE ONE+ / TWO PRINT JOBS", "250 x 220 mm beds. Revised steering: 5 mm brim. Body unchanged: 3 mm brim; no hull reprint needed.", (16, 8))
     for index, job in enumerate(("Steering", "Body")):
         xml = ET.parse(amf_dir / f"Lahar_v2_{job}.amf").getroot()
         job_objects = []
@@ -236,7 +269,7 @@ def main(amf_dir):
         label = "STEERING + CLAMPS + COUPON" if job == "Steering" else "ONE-PIECE BODY"
         axes.set_title(f"{label}  |  {prints[job]['estimated_time']}  |  {prints[job]['filament_including_waste_g']:.2f} g", fontsize=11, color=INK, pad=0)
     save(canvas, destination / "print-layouts.png",
-         "Geometry shown; brims/supports are omitted. The coupon shares the small-parts job. Clear the bed and check hardware fit before printing the body.")
+            "Geometry shown; brims/supports are omitted. All 16 parts are retained. For the reported vane failure, reprint only the steering job.")
     manifest = {
         "mesh_source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "images": {path.name: {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -244,7 +277,7 @@ def main(amf_dir):
                    if path.name != "exploded-hulls.png"},
     }
     (root / "reports" / "render-validation.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print("PASS: six nonblank CAD-derived renders generated")
+    print("PASS: seven nonblank CAD-derived renders generated")
 
 
 if __name__ == "__main__":

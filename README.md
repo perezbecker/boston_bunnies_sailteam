@@ -8,7 +8,7 @@ it.
 
 | Boat | Current | What it is |
 |---|---|---|
-| [**Lahar**](boats/lahar/) | v2 one-piece prototype | Rounded deck-down body with attached amas, beams and skeg. 220 mm, approximately 318 g all-up, solid vane, four-bolt yard clamps, keyed steering mounts and two CORE One+ print jobs. |
+| [**Lahar**](boats/lahar/) | v2 one-piece prototype | Rounded deck-down body with attached amas, beams and skeg. 220 mm, approximately 319 g all-up. Hull printed successfully; compatible flat-backed vane and revised CORE One+ steering job. |
 
 [![Lahar v2](boats/lahar/v2/renders/hero.png)](boats/lahar/v2/)
 

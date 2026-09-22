@@ -66,6 +66,8 @@
     }
   },
   "vane_plate_thickness_mm": 1.0,
+  "vane_first_layer_contact_area_mm2": 6863.400000000057,
+  "counterweight_arm_solid": true,
   "yard_clamps": {
     "Lower": {
       "parts": 3,
@@ -86,7 +88,7 @@
       "bolt_past_nut_mm": 0.5
     }
   },
-  "solid_pla_boat_upper_bound_g": 277.6135542770845,
+  "solid_pla_boat_upper_bound_g": 278.4637185136414,
   "rudder_full_sweep_clearance_mm": 10.709959061731416,
   "neutral_gain": -0.33333333182667957,
   "neutral_pin_distance_mm": 64.0,
@@ -257,6 +259,7 @@
     }
   ],
   "hardware_assumption": "8 mm OD clevis barrel 8-23 mm from pin; fork gap unverified",
+  "existing_hull_geometry_unchanged": true,
   "parts": {
     "Trimaran_Body": {
       "job": "Body",
@@ -380,17 +383,17 @@
     },
     "Vane_Frame": {
       "job": "Steering",
-      "triangles": 1720,
-      "volume_mm3": 8327.337911697681,
+      "triangles": 740,
+      "volume_mm3": 9012.95423150166,
       "centroid_mm": [
-        127.60166757093664,
-        -5.155813356166872e-17,
-        81.51982547048127
+        133.626367638904,
+        -1.8473437497854228,
+        81.24335903698069
       ],
       "print_bounds_mm": [
         174.0,
         99.0,
-        5.799351215362549
+        5.798726558685303
       ]
     },
     "Lower_Yard_Yard_Cap": {

@@ -18,15 +18,15 @@ from validate import validate_model
 LAYOUTS = {
     "Body": {"Trimaran_Body": (15, 5, 0)},
     "Steering": {
-        "Hardware_Fit_Coupon": (8, 8, 0),
-        "Rudder_Blade": (80, 8, 0), "Rudder_Tiller": (114, 8, 0),
-        "Vane_Arm": (156, 8, 0), "Rudder_Stand": (198, 8, 0),
-        "Vane_Stand": (8, 58, 0),
-        "Vane_Spacer": (210, 50, 0), "Rudder_Spacer": (228, 50, 0),
-        "Vane_Frame": (68, 102, 0),
-        "Lower_Yard_Yard_Cap": (46, 58, 0), "Lower_Yard_Saddle": (80, 70, 0),
-        "Lower_Yard_Mast_Cap": (112, 70, 0), "Upper_Yard_Yard_Cap": (144, 70, 0),
-        "Upper_Yard_Saddle": (176, 70, 0), "Upper_Yard_Mast_Cap": (208, 70, 0),
+        "Hardware_Fit_Coupon": (5.5, 8, 0),
+        "Rudder_Blade": (77.5, 8, 0), "Rudder_Tiller": (111.5, 8, 0),
+        "Vane_Arm": (153.9, 8, 0), "Rudder_Stand": (197.8, 8, 0),
+        "Vane_Stand": (8, 60, 0),
+        "Vane_Spacer": (210, 56, 0), "Rudder_Spacer": (228, 56, 0),
+        "Vane_Frame": (67, 106, 0),
+        "Lower_Yard_Yard_Cap": (8, 100, 0), "Lower_Yard_Saddle": (8, 134, 0),
+        "Lower_Yard_Mast_Cap": (8, 168, 0), "Upper_Yard_Yard_Cap": (79, 73, 0),
+        "Upper_Yard_Saddle": (114, 65, 0), "Upper_Yard_Mast_Cap": (150, 65, 0),
     },
 }
 
@@ -67,12 +67,12 @@ def write_amf(path, objects):
     ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
 
 
-def verify_layout(objects):
+def verify_layout(objects, brim_width=3.0):
     rectangles = []
     for name, mesh, position in objects:
         bounds = mesh.BoundBox
-        rectangle = (position[0] - 3.0, position[1] - 3.0,
-                     position[0] + bounds.XLength + 3.0, position[1] + bounds.YLength + 3.0)
+        rectangle = (position[0] - brim_width, position[1] - brim_width,
+                 position[0] + bounds.XLength + brim_width, position[1] + bounds.YLength + brim_width)
         if rectangle[0] < 0 or rectangle[1] < 0 or rectangle[2] > 250 or rectangle[3] > 220:
             raise ValueError(f"{name}: outside CORE One+ bed including brim: {rectangle}")
         for other_name, other in rectangles:
@@ -82,15 +82,25 @@ def verify_layout(objects):
         rectangles.append((name, rectangle))
 
 
-def export(amf_dir):
+def export(amf_dir, jobs):
     source = Path(__file__).resolve().parent
     root = source.parent
     stl_dir = root / "print" / "stl"
     report_dir = root / "reports"
     for directory in (stl_dir, report_dir, amf_dir):
         directory.mkdir(parents=True, exist_ok=True)
+    reference_hull = None
+    if "Body" not in jobs:
+        previous = App.openDocument(str(source / "Lahar_v2.FCStd"))
+        reference_hull = previous.getObject("Trimaran_Body").Shape.copy()
+        App.closeDocument(previous.Name)
     model = runpy.run_path(str(source / "lahar.FCMacro"))
     report = validate_model(model)
+    if reference_hull is not None:
+        hull = model["parts"]["Trimaran_Body"].Shape
+        if hull.cut(reference_hull).Volume + reference_hull.cut(hull).Volume > 0.001:
+            raise ValueError("Steering-only export must not change the existing hull")
+        report["existing_hull_geometry_unchanged"] = True
     document = model["doc"]
     print_meshes = {}
     report["parts"] = {}
@@ -116,7 +126,8 @@ def export(amf_dir):
         mesh = checked_mesh(shape)
         bounds = mesh.BoundBox
         mesh.translate(-bounds.XMin, -bounds.YMin, -bounds.ZMin)
-        mesh.write(str(stl_dir / f"{obj.Name}.stl"))
+        if obj.PrintJob in jobs:
+            mesh.write(str(stl_dir / f"{obj.Name}.stl"))
         print_meshes[obj.Name] = mesh
         bounds = mesh.BoundBox
         report["parts"][obj.Name] = {
@@ -130,8 +141,9 @@ def export(amf_dir):
         objects = [(name, print_meshes[name], position) for name, position in placements.items()]
         if set(placements) != {name for name, obj in model["parts"].items() if obj.PrintJob == job}:
             raise ValueError(f"Incomplete job layout: {job}")
-        verify_layout(objects)
-        write_amf(amf_dir / f"Lahar_v2_{job}.amf", objects)
+        verify_layout(objects, 5.0 if job == "Steering" else 3.0)
+        if job in jobs:
+            write_amf(amf_dir / f"Lahar_v2_{job}.amf", objects)
     engineering_input = {name: value for name, value in model.items()
                          if name.isupper() and isinstance(value, (int, float, list, tuple))}
     engineering_input["parts"] = report["parts"]
@@ -163,4 +175,6 @@ def export(amf_dir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--amf-dir", type=Path, required=True)
-    export(parser.parse_args().amf_dir)
+    parser.add_argument("--jobs", nargs="+", choices=tuple(LAYOUTS), default=tuple(LAYOUTS))
+    args = parser.parse_args()
+    export(args.amf_dir, args.jobs)

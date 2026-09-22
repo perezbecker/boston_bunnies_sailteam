@@ -62,10 +62,27 @@ def validate_model(model):
         raise ValueError("An internal flotation cell is open to the exterior or another cell")
     if model["parts"]["Trimaran_Body"].PrintRotationX != 180:
         raise ValueError("The one-piece body must print deck-down")
-    vane_center = Vector(model["VANE_X"] - model["VANE_LEVER"], 0, 83)
+    vane_center = Vector(model["VANE_X"] - model["VANE_LEVER"],
+                         model["VANE_PRINT_FACE_Y"] + model["VANE_PLATE_THICKNESS"] / 2, 83)
     vane_probe = Part.makeLine(vane_center - Vector(0, 2, 0), vane_center + Vector(0, 2, 0))
     if abs(vane_probe.common(parts["Vane_Frame"]).Length - model["VANE_PLATE_THICKNESS"]) > 0.001:
         raise ValueError("The wind vane must have a continuous printed solid web")
+    contact_slice = Part.makeBox(300, 0.02, 160, Vector(0, model["VANE_PRINT_FACE_Y"], 0))
+    vane_contact_area = parts["Vane_Frame"].common(contact_slice).Volume / 0.02
+    if vane_contact_area < model["VANE_WIDTH"] * model["VANE_HEIGHT"]:
+        raise ValueError("The complete solid vane blade must lie directly on the print bed")
+    stock_bore = Part.makeCylinder(model["STOCK_SOCKET"] / 2 - 0.001, 31.99,
+                                   Vector(model["VANE_X"], 0, 32))
+    stock_end = Part.makeCylinder(model["STOCK_SOCKET"] / 2 - 0.001, 0.5,
+                                  Vector(model["VANE_X"], 0, 64.1))
+    if parts["Vane_Frame"].common(stock_bore).Volume > 0.001:
+        raise ValueError("The vane braces obstruct the stock socket")
+    if abs(parts["Vane_Frame"].common(stock_end).Volume - stock_end.Volume) > 0.001:
+        raise ValueError("The vane stock socket is missing its closed end")
+    counterweight_bar = Part.makeBox(model["COUNTERWEIGHT_ARM_LENGTH"], 2.5 - model["VANE_PRINT_FACE_Y"], 2.4,
+                                     Vector(model["VANE_X"] + 1.0, model["VANE_PRINT_FACE_Y"], 81.8))
+    if counterweight_bar.cut(parts["Vane_Frame"]).Volume > 0.001:
+        raise ValueError("The vane counterweight arm must be solid without a slot or gap")
     mount_checks = {}
     cavity_shapes = Part.makeCompound(list(model["cavities"].values()))
     for name, keys in model["MOUNT_KEYS"].items():
@@ -167,6 +184,8 @@ def validate_model(model):
         "roof_final_gap_mm": model["CAVITY_ROOF_GAP"],
         "steering_mount_guides": mount_checks,
         "vane_plate_thickness_mm": model["VANE_PLATE_THICKNESS"],
+        "vane_first_layer_contact_area_mm2": vane_contact_area,
+        "counterweight_arm_solid": True,
         "yard_clamps": clamp_checks,
         "solid_pla_boat_upper_bound_g": sum(shape.Volume for shape in parts.values()) * 0.00124,
         "rudder_full_sweep_clearance_mm": clearance,
@@ -190,8 +209,8 @@ def mass_budget(model, print_report):
     vane = model["parts"]["Vane_Frame"]
     vane_moment = vane["volume_mm3"] * 0.00124 * (model["VANE_X"] - vane["centroid_mm"][0])
     balance_position = vane_moment / 3.0
-    if not model["COUNTERWEIGHT_SLOT_START"] <= balance_position <= model["COUNTERWEIGHT_SLOT_END"]:
-        raise ValueError("The nominal 3 g vane counterweight cannot balance the printed paddle within its slot")
+    if not model["COUNTERWEIGHT_BALANCE_START"] <= balance_position <= model["COUNTERWEIGHT_BALANCE_END"]:
+        raise ValueError("The nominal 3 g vane counterweight cannot balance the printed paddle on its solid arm")
     clamp_center = (model["CLAMP_FRONT_X"] + model["CLAMP_REAR_X"]) / 2
     index = math.radians(model["ARM_INDEX"])
     extras = [
@@ -295,6 +314,90 @@ def hydrostatic_equilibrium(model, mass, center, heel=0.0):
     }
 
 
+def steering_adhesion_report(root, amf_dir, model):
+    from collections import defaultdict
+    import hashlib
+    import xml.etree.ElementTree as ET
+
+    from shapely.geometry import LineString, box
+    from shapely.ops import unary_union
+
+    from slice_print import NUMBER, resolved_configuration
+
+    amf_path = amf_dir / "Lahar_v2_Steering.amf"
+    amf = ET.parse(amf_path).getroot()
+    vane = next(obj for obj in amf.findall("object") if obj.find("metadata").text == "Vane_Frame")
+    points = [[float(vertex.find(f"coordinates/{axis}").text) for axis in "xyz"]
+              for vertex in vane.findall("mesh/vertices/vertex")]
+    start_x = min(point[0] for point in points)
+    start_y = min(point[1] for point in points)
+    region = box(start_x + 1, start_y + 1, start_x + model["VANE_WIDTH"] - 1,
+                 start_y + model["VANE_HEIGHT"] - 1)
+    gcode_path = root / "print" / "usb" / "Lahar_v2_Steering_COREONEplus_PLA_04.gcode"
+    text = gcode_path.read_text(encoding="utf-8")
+    _, settings = resolved_configuration(text)
+    width = float(settings["first_layer_extrusion_width"])
+    position = dict.fromkeys("XYZE", 0.0)
+    relative_extrusion = False
+    relative_position = False
+    path_type = ""
+    layer = 0
+    feed = 0.0
+    maximum_speed = 0.0
+    lengths = defaultdict(float)
+    footprints = []
+    for raw in text.splitlines():
+        if raw == ";LAYER_CHANGE":
+            layer += 1
+            if layer > 1:
+                break
+        if raw.startswith(";TYPE:"):
+            path_type = raw[6:]
+        command = raw.partition(";")[0].strip()
+        if not command:
+            continue
+        opcode = command.split()[0]
+        values = {key: float(value) for key, value in NUMBER.findall(command)}
+        if opcode == "M83":
+            relative_extrusion = True
+        elif opcode == "M82":
+            relative_extrusion = False
+        elif opcode == "G90":
+            relative_position = False
+        elif opcode == "G91":
+            relative_position = True
+        elif opcode == "G92":
+            position.update({key: value for key, value in values.items() if key in position})
+        elif opcode in ("G0", "G1"):
+            previous = position.copy()
+            for axis in "XYZ":
+                if axis in values:
+                    position[axis] = values[axis] + (previous[axis] if relative_position else 0)
+            feed = values.get("F", feed)
+            extrusion = values.get("E", 0) if relative_extrusion else values.get("E", previous["E"]) - previous["E"]
+            position["E"] = previous["E"] + extrusion
+            if layer == 1 and extrusion > 0 and ("X" in values or "Y" in values):
+                segment = LineString([(previous["X"], previous["Y"]), (position["X"], position["Y"])]).intersection(region)
+                if segment.is_empty or segment.length < 0.01:
+                    continue
+                category = "support" if "Support" in path_type else "model"
+                lengths[category] += segment.length
+                maximum_speed = max(maximum_speed, feed / 60)
+                if category == "model":
+                    footprints.append(segment.buffer(width / 2))
+    coverage = unary_union(footprints).intersection(region).area / region.area
+    if lengths["model"] < 10000 or lengths["support"] > 0.001 or coverage < 0.95 or maximum_speed > 15.001:
+        raise ValueError(f"Vane adhesion check failed: paths={dict(lengths)}, coverage={coverage}, speed={maximum_speed}")
+    return {
+        "sampled_blade_region_mm": list(region.bounds), "sampled_blade_area_mm2": region.area,
+        "first_layer_model_path_mm": lengths["model"], "first_layer_support_path_mm": lengths["support"],
+        "nominal_extrusion_coverage_fraction": coverage, "maximum_first_layer_speed_mm_s": maximum_speed,
+        "brim_mm": float(settings["brim_width"]), "brim_separation_mm": float(settings["brim_separation"]),
+        "gcode_sha256": hashlib.sha256(text.encode()).hexdigest(),
+        "note": "Toolpath coverage uses nominal extrusion width; this is not a physical bed-adhesion test.",
+    }
+
+
 def engineering_report(model, print_report):
     budget = mass_budget(model, print_report)
     center = budget["nominal_cg_mm"]
@@ -329,8 +432,8 @@ def engineering_report(model, print_report):
             "printed_vane_mass_g": vane_mass,
             "printed_vane_fore_aft_moment_g_mm": vane_moment,
             "paddle_only_counterweight_3g_position_mm": vane_moment / 3.0,
-            "counterweight_slot_mm": [model["COUNTERWEIGHT_SLOT_START"], model["COUNTERWEIGHT_SLOT_END"]],
-            "balance_note": "Paddle-only static moment; rebalance with stock, arm and clevis connected. Budget includes 3 g fore-aft hardware plus 1.5 g lateral nuts.",
+            "counterweight_attachment_range_mm": [model["COUNTERWEIGHT_BALANCE_START"], model["COUNTERWEIGHT_BALANCE_END"]],
+            "balance_note": "Lash the existing counterweight to the solid bar; no slot or through-hole. Paddle-only static moment; rebalance with stock, arm and clevis connected. Budget includes 3 g fore-aft hardware plus 1.5 g lateral nuts.",
             "v1_area_lever_improvement": area * model["VANE_LEVER"] / (0.036 * 0.072 * 21),
             "vane_torque_at_10deg_Nmm": {str(speed): torque_at_one * speed ** 2 for speed in (0.5, 0.75, 1.0, 1.5, 2.0)},
             "friction_acceptance_target_at_vane_Nmm": 0.010,
@@ -358,6 +461,7 @@ if __name__ == "__main__":
             parser.error("--engineering requires --amf-dir from export_print.py")
         model = json.loads((args.amf_dir / "hydrostatics-input.json").read_text())
         report = engineering_report(model, json.loads((source.parent / "reports" / "print-validation.json").read_text()))
+        report["steering_print_adhesion"] = steering_adhesion_report(source.parent, args.amf_dir, model)
         (source.parent / "reports" / "engineering.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps({key: value for key, value in report.items() if key != "mass_budget"}, indent=2))
         print("Mass budget:", report["mass_budget"]["nominal_all_up_g"], "g nominal;",

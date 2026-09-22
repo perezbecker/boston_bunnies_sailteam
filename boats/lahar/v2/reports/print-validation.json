@@ -1,22 +1,22 @@
 {
   "Steering": {
     "file": "Lahar_v2_Steering_COREONEplus_PLA_04.gcode",
-    "estimated_time": "5h 52m 22s",
-    "filament_including_waste_g": 58.02,
-    "extruding_moves": 323422,
-    "support_moves": 14716,
+    "estimated_time": "7h 52m 7s",
+    "filament_including_waste_g": 53.45,
+    "extruding_moves": 322050,
+    "support_moves": 11071,
     "extrusion_min_mm": {
-      "X": 4.15,
+      "X": 1.358,
       "Y": 3.757,
       "Z": 0.2
     },
     "extrusion_max_mm": {
-      "X": 247.751,
-      "Y": 205.243,
+      "X": 247.551,
+      "Y": 209.142,
       "Z": 25.85
     },
-    "toolpath_sha256": "c25b4ed72289f412b13da296dc4e89e6eacba2e4662f079a47a5fc9aa7032dfd",
-    "gcode_sha256": "04f7863c1d7c62ca1178130de61b2faeb1149561beddb5b7ba54dfb0509cd061",
+    "toolpath_sha256": "3908c98367ad2c7355c412003ddf042173b1d53a6dedf25cb9846352ad80dcf7",
+    "gcode_sha256": "54945d4816a43a860353e563c6633574f1c87e263b4e4b1642c9391423ac10c5",
     "printer_preset": "Prusa CORE One HF0.4 nozzle",
     "printer_model": "COREONE",
     "build_volume_mm": [
@@ -29,6 +29,10 @@
     "first_layer_temperature_c": "230",
     "bed_temperature_c": "60",
     "chamber_temperature_c": "20",
+    "brim_width_mm": 5.0,
+    "first_layer_speed_mm_s": 15.0,
+    "first_layer_max_extrusion_speed_mm_s": 15.0,
+    "first_layer_acceleration_mm_s2": 300.0,
     "standalone_project_roundtrip": true
   },
   "Body": {

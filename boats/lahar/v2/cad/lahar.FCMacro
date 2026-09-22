@@ -84,9 +84,10 @@ VANE_WIDTH = 64.0
 VANE_HEIGHT = 96.0
 VANE_LEVER = 40.0
 VANE_PLATE_THICKNESS = 1.0
+VANE_PRINT_FACE_Y = -2.9
 COUNTERWEIGHT_ARM_LENGTH = 101.0
-COUNTERWEIGHT_SLOT_START = 35.0
-COUNTERWEIGHT_SLOT_END = 95.0
+COUNTERWEIGHT_BALANCE_START = 35.0
+COUNTERWEIGHT_BALANCE_END = 95.0
 
 
 def cylinder(diameter, height, base):
@@ -316,24 +317,24 @@ add_part("Rudder_Blade", rudder, "Steering", 90.0, (0.88, 0.28, 0.22))
 
 frame_start = VANE_X - 8.0 - VANE_WIDTH
 frame_bottom = 35.0
-frame = Part.makeBox(VANE_WIDTH, 1.2, VANE_HEIGHT, Vector(frame_start, -0.6, frame_bottom))
-frame = frame.cut(Part.makeBox(VANE_WIDTH - 4.0, 2.0, VANE_HEIGHT - 4.0,
-                               Vector(frame_start + 2.0, -1.0, frame_bottom + 2.0)))
+frame = Part.makeBox(VANE_WIDTH, 1.2, VANE_HEIGHT, Vector(frame_start, VANE_PRINT_FACE_Y, frame_bottom))
+frame = frame.cut(Part.makeBox(VANE_WIDTH - 4.0, 1.4, VANE_HEIGHT - 4.0,
+                               Vector(frame_start + 2.0, VANE_PRINT_FACE_Y - 0.1, frame_bottom + 2.0)))
 frame = frame.fuse(Part.makeBox(VANE_WIDTH, VANE_PLATE_THICKNESS, VANE_HEIGHT,
-                               Vector(frame_start, -VANE_PLATE_THICKNESS / 2, frame_bottom)))
+                               Vector(frame_start, VANE_PRINT_FACE_Y, frame_bottom)))
 spine = Part.makeBox(4.0, 2.4, frame_bottom + VANE_HEIGHT - 32.0,
-                     Vector(VANE_X - 2.0, -1.2, 32.0))
+                     Vector(VANE_X - 2.0, VANE_PRINT_FACE_Y, 32.0))
 spine = spine.fuse(cylinder(5.8, 34.0, (VANE_X, 0, 32.0)))
+spine = spine.fuse(Part.makeBox(5.8, -VANE_PRINT_FACE_Y, 34.0,
+                                Vector(VANE_X - 2.9, VANE_PRINT_FACE_Y, 32.0)))
 spine = spine.cut(cylinder(STOCK_SOCKET, 32.0, (VANE_X, 0, 32.0)))
 frame = frame.fuse(spine)
 for level in (frame_bottom, frame_bottom + VANE_HEIGHT - 2.0):
-    frame = frame.fuse(Part.makeBox(10.0, 2.4, 2.0, Vector(VANE_X - 8.0, -1.2, level)))
-counterweight = Part.makeBox(COUNTERWEIGHT_ARM_LENGTH, 5.0, 2.4, Vector(VANE_X + 1.0, -2.5, 81.8))
-slot = Part.makeBox(COUNTERWEIGHT_SLOT_END - COUNTERWEIGHT_SLOT_START, 3.2, 3.0,
-                    Vector(VANE_X + COUNTERWEIGHT_SLOT_START, -1.6, 81.5))
-for offset in (COUNTERWEIGHT_SLOT_START, COUNTERWEIGHT_SLOT_END):
-    slot = slot.fuse(cylinder(3.2, 3.0, (VANE_X + offset, 0, 81.5)))
-frame = frame.fuse(counterweight.cut(slot))
+    frame = frame.fuse(Part.makeBox(10.0, 2.4, 2.0, Vector(VANE_X - 8.0, VANE_PRINT_FACE_Y, level)))
+counterweight = Part.makeBox(COUNTERWEIGHT_ARM_LENGTH, 2.5 - VANE_PRINT_FACE_Y, 2.4,
+                             Vector(VANE_X + 1.0, VANE_PRINT_FACE_Y, 81.8))
+frame = frame.fuse(counterweight)
+frame = frame.cut(cylinder(STOCK_SOCKET, 32.0, (VANE_X, 0, 32.0)))
 add_part("Vane_Frame", frame, "Steering", 90.0, (0.88, 0.28, 0.22))
 
 

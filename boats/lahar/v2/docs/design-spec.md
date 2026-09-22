@@ -5,11 +5,14 @@ Boston Bunnies Sail Team, 2026-09-15. Source of truth:
 [engineering.json](../reports/engineering.json).
 
 Printer files were re-sliced for the **CORE One+, stock 0.4 mm high-flow nozzle,
-ordinary 1.75 mm PLA and smooth PEI** on 2026-09-16. The geometry and two-bed
-layout are unchanged; these are single-material jobs without an MMU.
+ordinary 1.75 mm PLA and smooth PEI** on 2026-09-16. The steering print was
+revised for bed adhesion on **2026-09-22**. The body geometry and its printer
+files are unchanged; these are single-material jobs without an MMU.
 
-**This is an untested physical prototype.** The design addresses v1's reported
-leaks, rudder interference, clevis mismatch and steering-friction concerns.
+**Physical status:** the owner reports a successful hull print and vane
+detachment during the previous steering print. The revised vane is not yet
+physically test-printed. The design addresses v1's reported leaks, rudder
+interference, clevis mismatch and steering-friction concerns.
 No software check can certify an FDM hull as watertight or establish the friction
 of the user's bearings. Complete the acceptance tests before open-water use.
 
@@ -35,7 +38,7 @@ of the user's bearings. Complete the acceptance tests before open-water use.
 4. **Lower-load steering with the existing hardware.** Keep the two 623ZZ
    bearings and carbon stocks. Use short clearance guides, inner-race spacers,
    a quarter-chord rudder, thin clevis tabs and indexed cranks. The vane is now
-   solid printed plastic again, with a 1 mm web and an extended counterweight slot.
+   solid printed plastic again, with a 1 mm web and a solid counterweight bar.
    There is still plain-guide and clevis friction; the system is not frictionless.
 5. **Four-bolt yard clamps.** Two three-piece clamp sets attach the existing
    6 mm mast to the two 4 mm yards. Each uses four M2 x 16 socket-cap bolts and
@@ -44,6 +47,49 @@ of the user's bearings. Complete the acceptance tests before open-water use.
    in the revised mass calculation; the hull's forward sections are slightly fuller.
 
 ![One-piece body in sailing and print orientation](../renders/one-piece-body.png)
+
+## Steering print revision
+
+The reported failure did not identify whether the support base, model/support
+interface, contamination or another print condition caused the detachment.
+The earlier CAD did establish a poor direct-contact arrangement: the 5.8 mm
+stock boss held the broad blade above the bed, where it depended on supports.
+
+The revised vane has a common flat printing face at sailing Y=-2.9. The 1 mm
+blade is moved sideways so its center is Y=-2.4; the spine, lower boss and
+counterweight rail meet the same plane. The broad face therefore prints
+directly on the sheet. The solid blade area, shaft axis X=154/Y=0, mounting
+height and nominal 3.2 mm x 32 mm blind socket remain the same. The bore is
+cut after all braces are joined, removing the previous lower-brace intrusion.
+
+At the owner's request, the long counterweight slot is also removed. The
+101 x 5.4 x 2.4 mm arm is now solid throughout, with no replacement holes.
+This change only fills the previous void; it does not change the arm's outer
+dimensions, shaft socket, blade or any other part. The slot was suspected of
+contributing to the failed print, but the cause has not been established.
+The existing screw/nuts can be lashed to the bar using rigging thread; see
+[counterweight attachment](#counterweight-attachment).
+
+All other printed solids, including the keyed stands, feet, bearings' seats,
+rudder, arms, spacers and yard clamps, remain unchanged. The body STL, 3MF and
+G-code are byte-identical to the previous files. No hull reprint, drilling or
+new mounting hardware is required.
+
+The revised vane has approximately 6,863 mm2 of direct model contact in the
+first 0.2 mm, compared with about 48 mm2 for the previous vane itself. These
+figures exclude brims and supports; they do not mean total bed contact increased
+by that ratio. Actual new G-code has dense model extrusion, not support, under
+the blade. The [engineering report](../reports/engineering.json) records a
+first-layer coverage and speed check. The old design fails that direct-model
+contact criterion.
+
+The steering job uses a 5 mm attached brim, 15 mm/s first-layer perimeter and
+infill speeds, 300 mm/s2 first-layer acceleration, lower subsequent perimeter
+acceleration and slower travel. Body settings are unchanged. Clean smooth PEI,
+an unobstructed PLA ventilation path and first-layer observation still matter;
+these software checks do not guarantee physical adhesion.
+
+![Flat-backed vane and first-layer contact](../renders/vane-print-contact.png)
 
 ## Dimensions
 
@@ -71,8 +117,10 @@ Z is upward. The continuous deck is Z=1.2, retained from the steering layout.
 | Full rudder sweep clearance | 10.71 minimum to the complete body and integral skeg |
 | Integral skeg | X=150 to 184, 3 thick; tip Z=-64 |
 | Solid printed vane | 64 x 96 area, 1.0 web, 1.2 rim; no film |
+| Vane flat printing face / blade center | Y=-2.9 / Y=-2.4; stock axis remains Y=0 |
 | Vane aerodynamic center lever | 40 from axis |
-| Vane counterweight slot | 35 to 95 from axis |
+| Solid counterweight bar | 101 x 5.4 x 2.4; no slot or through-hole |
+| Counterweight lashing range | 35 to 95 from the vane shaft axis |
 | Vane / tiller gain holes | 12, 15, 18 / 30, 36, 42 |
 | Clevis tabs / pivot holes | 1.8 thick / 2.3 diameter |
 | Neutral pin-to-pin length | 64 with the 12/36 hole pair |
@@ -91,7 +139,7 @@ Loft interpolation makes measured dimensions differ slightly from station values
 
 | Component group | Nominal mass |
 | --- | --- |
-| One body, eight steering parts and six clamp pieces, at PLA density 1.24 g/cm3 | 277.61 g |
+| One body, eight steering parts and six clamp pieces, at PLA density 1.24 g/cm3 | 278.46 g |
 | Mast, two yards, sail and rigging | 9.69 g |
 | Carbon stocks | 1.52 g |
 | Two 623ZZ bearings | 3.40 g |
@@ -99,23 +147,24 @@ Loft interpolation makes measured dimensions differ slightly from station values
 | Eight M2 x 16 clamp bolts and eight M2 nuts | 5.60 g |
 | Fore-aft counterweight and lateral balance nuts allowance | 4.50 g |
 | Adhesive and seal coat allowance | 10.00 g |
-| **Nominal all-up** | **318.32 g** |
+| **Nominal all-up** | **319.17 g** |
 
 Hardware masses, wood density, cloth weight and seal-coat mass are assumptions,
 not measurements. Cloth is budgeted at 30 g/m2. Weigh the actual parts.
 The body alone is 239.77 g by CAD volume; both clamp sets together are 16.49 g.
-The complete solid vane including its spine and counterweight arm is 10.33 g.
-The two print jobs consume 296.83 g, including the coupon, supports and brims.
+The complete solid vane including its spine and counterweight arm is 11.18 g,
+about 0.60 g heavier than the flat-backed vane with a slot. The hull mass is unchanged.
+The two print jobs consume 292.26 g, including the coupon, supports and brims.
 The coupon now shares the steering bed, but is never part of the boat's displacement.
-Subtracting its 8.57 g CAD material estimate leaves 288.26 g; counting all the
-remaining waste as if it stayed on the boat gives a conservative **328.97 g** case.
-The printer change does not change the nominal assembled mass or center of gravity.
+Subtracting its 8.57 g CAD material estimate leaves 283.69 g; counting all the
+remaining waste as if it stayed on the boat gives a conservative **324.40 g** case.
+This reduction is mostly discarded support material, not a lighter hull.
 
 | Fresh-water case | Waterline at X=110 | Trim | Minimum deck freeboard | Lowest ama bottom |
 | --- | --- | --- | --- | --- |
-| Nominal 318.32 g | Z=-14.81 | 1.11 deg bow-down | 13.88 mm | 0.74 mm immersed |
-| Conservative 328.97 g | Z=-13.96 | 0.96 deg bow-down | 13.32 mm | 1.58 mm immersed |
-| 350 g loading check | Z=-12.41 | 0.65 deg bow-down | 12.36 mm | 3.12 mm immersed |
+| Nominal 319.17 g | Z=-14.75 | 0.98 deg bow-down | 14.06 mm | 0.80 mm immersed |
+| Conservative 324.40 g | Z=-14.33 | 0.91 deg bow-down | 13.78 mm | 1.21 mm immersed |
+| 340 g loading check | Z=-13.13 | 0.68 deg bow-down | 13.03 mm | 2.39 mm immersed |
 
 These are static calculations on closed exterior meshes generated from the CAD
 with 0.04 mm deflection. Each mesh volume is checked against its CAD envelope.
@@ -133,9 +182,9 @@ ballast, waves, wood water uptake and leaks change the answer. Do not reuse v1's
 
 The planning-load model has restoring moments at both signs of 5 and 10 degrees
 of heel. At 10 degrees in the conservative-weight case, the low-side deck has
-only about **0.4 mm freeboard**, effectively awash in small ripples. Wave and
+only about **0.7 mm freeboard**, effectively awash in small ripples. Wave and
 splash tolerance need physical testing. This is not a capsize angle or wind
-rating. Use **350 g as a re-evaluation threshold**, not a certified carrying
+rating. Use **340 g as a re-evaluation threshold**, not a certified carrying
 capacity. Begin in sheltered, steady conditions with a retrieval line.
 
 ![Main hull section](../renders/hull-section.png)
@@ -188,11 +237,13 @@ coefficient. The object retains the name `Vane_Frame`, but no film is required.
 It remains upstream of the sail while running downwind.
 
 The larger solid paddle is not as light as the film version: its complete
-printed mass is about 10.33 g. The 35-95 mm counterweight slot provides enough
-reach for approximately 3 g of balancing hardware near 91 mm for the paddle
+printed mass is about 11.18 g. The solid counterweight bar provides enough
+reach for approximately 3 g of balancing hardware near 76 mm for the paddle
 alone. This is a starting estimate, not a balance prescription for the complete
 linkage. Rebalance with the stock, arm and metal clevis connected, including
-the lateral imbalance. The mass budget allows another 1.5 g of lateral nuts.
+the lateral imbalance. The flat printing face moves the blade's mass to one
+side, so do not reuse an earlier balance setting without checking both axes.
+The mass budget allows another 1.5 g of lateral nuts; weigh any extra hardware.
 More inertia and bearing load mean that increased area does not guarantee
 good response in very light wind.
 
@@ -266,7 +317,7 @@ The CAD references show the slightly longer nominal lengths. Do not buy larger
 bearings, different dowels or a replacement linkage just for this iteration.
 
 The vane now prints complete: do not attach film. Weigh your existing balance
-screw and nuts, and position them in the longer slot. Lash spare nuts to the
+screw and nuts, and lash them to the solid counterweight bar. Lash spare nuts to the
 lateral balance ear using rigging thread if needed. The clamp hardware is the
 only newly specified set of metal fasteners; it is not part of the printed jobs.
 
@@ -274,6 +325,27 @@ An external sealer is optional if the soak test shows porosity; there are no
 lid seams to glue. Use appropriate adhesive for the steering stands and stock
 sockets. Follow the adhesive's PLA-compatibility, curing and ventilation instructions;
 use appropriate gloves and eye protection, and keep adhesive out of bearings.
+
+## Counterweight attachment
+
+The counterweight arm is deliberately solid: **do not drill it or recreate the
+slot**. Reuse the existing M3 screw/nuts as a small weight bundle and the rigging
+thread already in the materials list; no new printed connector is required.
+
+1. Weigh the hardware together. For about 3 g, start with the bundle's center
+   approximately **76 mm aft of the vane shaft axis**. This is the paddle-only
+   estimate, not the final setting for the connected linkage.
+2. Lay the bundle alongside the bar and use two spaced wraps of thread around
+   both the weight and bar. Leave the wraps adjustable during a dry balance
+   check; move the bundle along the 35-95 mm attachment range as needed. The
+   screws do not pass through the plastic.
+3. Connect the stock, vane arm and clevis linkage, then balance fore-aft and
+   sideways with the boat tipped 10-15 degrees. Keep the bundle close to the
+   bar's height and use the lateral balance ear for residual sideways bias.
+4. Tighten and lock both lashings so the weight cannot slide, rotate or fall
+   off. Recheck balance and the full steering travel after securing it, then
+   after a shallow-water test. Any additional thread or adhesive must be
+   included in the measured final mass. Do not sail with a temporarily tied weight.
 
 ## Yard clamps
 
@@ -351,7 +423,8 @@ Bearing heights, stock heights and the 64 mm neutral linkage remain unchanged.
 
 1. Print the combined steering, clamps and coupon job, remove the brim and
    supports, and pass the [hardware fit checks](../instructions.md#fit-check-before-the-body).
-   Then clear the bed and print the body. There are only two supplied print jobs.
+   Then clear the bed and print the body only for a new boat. Reuse your already
+   printed v2 hull for this steering repair; there are still two supplied jobs.
 2. Inspect the continuous deck, rounded hulls and beam transitions for gaps or
    loose extrusion. Do not cut open the hulls, remove the internal ribs, or drill
    drain holes. Amas and skeg are already attached and aligned by the print.
@@ -382,7 +455,8 @@ Bearing heights, stock heights and the 64 mm neutral linkage remain unchanged.
     linkage in one horizontal plane. Check the actual fork cheeks and screw
     heads, which the product drawing does not fully dimension.
 10. Fit the complete solid vane and balance the **whole moving system with the
-   linkage connected**. Slide the existing M3 screw/nuts along the longer fore-aft slot, and
+   linkage connected**. Lash the existing M3 screw/nuts to the solid fore-aft
+    bar as described in [counterweight attachment](#counterweight-attachment), and
     use spare nuts on the opposite lateral balance ear to offset the metal
     clevis. Tilt the boat 10-15 degrees about both axes: the vane must not
     consistently fall to one side. Counterweights are adjustable, not shown
@@ -405,7 +479,7 @@ Bearing heights, stock heights and the 64 mm neutral linkage remain unchanged.
   rejection, not an acceptable allowance. Fix and repeat until stable.
 - **Loaded flotation:** use the measured sailing mass and placement. Amas can
   touch lightly; deeply immersed amas or unexpected bow/stern immersion mean
-   the load distribution differs from the model. Re-evaluate if over 350 g.
+   the load distribution differs from the model. Re-evaluate if over 340 g.
 - **Bearing/clevis friction:** the complete linkage must respond freely in
   both directions without sticking, including while tilted. The model's
   0.010 N mm target corresponds to about an 0.085 g trial load at a 12 mm lever;
@@ -432,13 +506,14 @@ It contains printable parts and objects labeled `Reference - do not print`.
 Its generated Part solids are driven by the [macro](../cad/lahar.FCMacro), not
 by an independent hand-edited drawing. Change that source and regenerate.
 
-From the repository root, with FreeCAD's Python environment configured:
+For the steering-only repair, from the repository root with FreeCAD's Python
+environment configured, preserve the already-printed hull using `--jobs Steering`:
 
 ```sh
-"$FREECAD_PYTHON" boats/lahar/v2/cad/export_print.py --amf-dir "$WORK"
+"$FREECAD_PYTHON" boats/lahar/v2/cad/export_print.py --amf-dir "$WORK" --jobs Steering
 python3 boats/lahar/v2/cad/slice_print.py \
   --slicer "$PRUSA_SLICER" --profiles "$PRUSA_PROFILES" \
-  --amf-dir "$WORK" --roundtrip
+   --amf-dir "$WORK" --jobs Steering --roundtrip
 "$RENDER_PYTHON" boats/lahar/v2/cad/validate.py --engineering --amf-dir "$WORK"
 "$RENDER_PYTHON" boats/lahar/v2/cad/render.py --amf-dir "$WORK"
 ```
@@ -448,6 +523,10 @@ ordinary-Python environment for `RENDER_PYTHON`, which now runs both the mesh-ba
 flotation check and the renders. FreeCAD's Python must import
 FreeCAD, Part and MeshPart; import FreeCAD before Part. Tested with FreeCAD
 1.1.3, ordinary Python 3.12, and official PrusaSlicer 2.9.6.
+The steering-only exporter compares the rebuilt hull with the saved CAD and
+aborts if its geometry changed. It does not write the body STL or AMF; the
+steering-only slicer does not write the body project or G-code. Omit `--jobs`
+only when intentionally rebuilding both jobs for a new boat.
 
 For the current WSL setup, FreeCAD is extracted under
 `/tmp/lahar-tools/freecad/squashfs-root/usr`; its `bin/python` needs `PYTHONPATH`
@@ -462,7 +541,10 @@ used for hydrostatics to the working directory. The one-piece body, 46 closed
 cells, deck-down orientation, skin thickness and steering travel are checked
 before export, along with the solid vane web, clamp hardware fit, blind-guide
 backing and rejection of reversed/swapped mounts. The two projects must round-trip and remain inside the actual
-250 x 220 x 270 mm CORE One+ volume. No physical print or leak test has been performed.
+250 x 220 x 270 mm CORE One+ volume. The engineering command also validates
+actual first-layer model coverage beneath the vane, absence of support under
+its blade and the 15 mm/s speed cap. The owner has printed the hull; the revised
+steering print, leakage and on-water performance still need physical tests.
 
 Rebuilds overwrite only generated assets inside this v2 directory. Never run a
 rebuild inside the frozen v1 archive. Preserve physical test observations before

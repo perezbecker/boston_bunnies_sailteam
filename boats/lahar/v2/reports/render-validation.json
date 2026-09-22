@@ -1,5 +1,5 @@
 {
-  "mesh_source_sha256": "d1433637a9026a7eb74321a82358ab2809677dece472079e94ae8158e2b0a8b6",
+  "mesh_source_sha256": "2a2fb416c4bb883c2674d6f502d8786ea95043ca47106da290b783e441a5f71b",
   "images": {
     "assembly-details.png": {
       "sha256": "9209cc1600092be0e26da85f9c4c90113c60ef48e667d04147749cdd81588a0c",
@@ -9,14 +9,14 @@
       ]
     },
     "hero.png": {
-      "sha256": "02801b1dac2ee00cdea9f743f3f0549c09888989bf136f3308795c1088242466",
+      "sha256": "1a65a489512ff343634dc19a5fae85d000c111fca498d8449cc38c5f06793cfc",
       "pixels": [
         2400,
         1600
       ]
     },
     "hull-section.png": {
-      "sha256": "cf91f3cb80b65877d434b8f814cc47cfa2f00f9342d48a7c82eceeb91e60f988",
+      "sha256": "c27cd578dd980616bb9735f4a5ce8c8a8e357b2e2ab63e8e735fdc9062895178",
       "pixels": [
         2400,
         1280
@@ -30,17 +30,24 @@
       ]
     },
     "print-layouts.png": {
-      "sha256": "0df3189d5ebc0be7c85001bd13052b10e9e00071bd973a0c8289605e60af64db",
+      "sha256": "e8ea9dd85a7b4b75d62224aecd040b542da9de6d8eea32dc7bd3969b354f33f2",
       "pixels": [
         2560,
         1280
       ]
     },
     "steering-gear.png": {
-      "sha256": "6ec1ba3ecd3f051da219f79cb1eeba839db23fb8f1b81f98f5c36d0f009a16f8",
+      "sha256": "e23e7a8b8b6cba13aa3a0d6b78d7d9a3ac39f4850ba01b0f22bf681b25280293",
       "pixels": [
         2400,
         1600
+      ]
+    },
+    "vane-print-contact.png": {
+      "sha256": "abdc51e9fae7089329d3cd5319df233b7f5f6178b4a5df488d50c169e5739beb",
+      "pixels": [
+        2560,
+        1440
       ]
     }
   }
